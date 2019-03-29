@@ -2,6 +2,8 @@
 #' Create EDF clusters
 #'
 #' @param planning Calendar data read with \code{\link{read_calendar}}.
+#' @param start_date Starting date of the study, if \code{NULL} (default),
+#'  the date will be retrieve from the Antares study.
 #' @param opts
 #'   List of simulation parameters returned by the function
 #'   \code{setSimulationPath} 
@@ -13,7 +15,10 @@
 #' @importFrom lubridate hours days as_datetime
 #' @importFrom stats setNames
 #' @importFrom stringi stri_replace_all_regex
-create_clusters_edf <- function(planning, opts = simOptions()) {
+create_clusters_edf <- function(planning, start_date = NULL, opts = simOptions()) {
+  
+  if (is.null(start_date))
+    start_date <- format(opts$start, format = "%Y-%m-%d")
   
   planning <- copy(planning)
   planning <- planning[!is.na(code_gp)]
@@ -35,7 +40,7 @@ create_clusters_edf <- function(planning, opts = simOptions()) {
           ncol = 4
         )
       } else {
-        datetime_study <- seq(from = as.POSIXct("2018-07-01", tz = "UTC"), length.out = 8760, by = "1 hour")
+        datetime_study <- seq(from = as.POSIXct(start_date, tz = "UTC"), length.out = 8760, by = "1 hour")
         datetime_study <- as.character(datetime_study)
         datetime_prolongation <- lapply(
           X = seq_len(nrow(dat)), 

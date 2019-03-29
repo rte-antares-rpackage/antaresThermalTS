@@ -5,8 +5,8 @@
 \title{Create nuclear clusters}
 \usage{
 create_clusters_nuclear(calendar, clusters_desc, kd_cho,
-  law_planned = "geometric", volatility_planned = 1,
-  opts = simOptions())
+  start_date = NULL, law_planned = "geometric",
+  volatility_planned = 1, opts = simOptions())
 }
 \arguments{
 \item{calendar}{Calendar data read with \code{\link{read_calendar}}.}
@@ -14,6 +14,9 @@ create_clusters_nuclear(calendar, clusters_desc, kd_cho,
 \item{clusters_desc}{Clusters / groups description read with \code{\link{read_cluster_desc}}.}
 
 \item{kd_cho}{Kd coefficients read with \code{\link{read_kd_cho}}.}
+
+\item{start_date}{Starting date of the study, if \code{NULL} (default),
+the date will be retrieve from the Antares study.}
 
 \item{law_planned}{Law to use in Antares.}
 

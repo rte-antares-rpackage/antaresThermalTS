@@ -4,6 +4,8 @@
 #' @param calendar Calendar data read with \code{\link{read_calendar}}.
 #' @param clusters_desc Clusters / groups description read with \code{\link{read_cluster_desc}}.
 #' @param kd_cho Kd coefficients read with \code{\link{read_kd_cho}}.
+#' @param start_date Starting date of the study, if \code{NULL} (default),
+#'  the date will be retrieve from the Antares study.
 #' @param law_planned Law to use in Antares.
 #' @param volatility_planned Volatility for the law.
 #' @param opts
@@ -17,7 +19,12 @@
 #' @importFrom lubridate hours days
 #' @importFrom stats setNames
 #' @importFrom stringi stri_replace_all_regex
-create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, law_planned = "geometric", volatility_planned = 1, opts = simOptions()) {
+create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date = NULL, 
+                                    law_planned = "geometric", volatility_planned = 1, opts = simOptions()) {
+  
+  if (is.null(start_date))
+    start_date <- format(opts$start, format = "%Y-%m-%d")
+  
   
   # Modulation data
   modulation_list <- lapply(
@@ -36,7 +43,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, law_planned
           ncol = 4
         )
       } else {
-        datetime_study <- seq(from = as.POSIXct("2018-07-01", tz = "UTC"), length.out = 8760, by = "1 hour")
+        datetime_study <- seq(from = as.POSIXct(start_date, tz = "UTC"), length.out = 8760, by = "1 hour")
         datetime_study <- as.character(datetime_study)
         datetime_prolongation <- lapply(
           X = seq_len(nrow(dat)), 
@@ -52,7 +59,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, law_planned
           }
         )
         
-        coef_clus <- get_clusters_coef(cluster, clusters_desc, kd_cho, "2018-07-01")
+        coef_clus <- get_clusters_coef(cluster, clusters_desc, kd_cho, start_date)
         
         datetime_prolongation <- unlist(datetime_prolongation)
         capacity_modulation <- (!datetime_study %in% datetime_prolongation) * rep(coef_clus$abat_rso, each = 24)
@@ -86,7 +93,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, law_planned
           ncol = 6
         )
       } else {
-        date_study <- seq(from = as.Date("2018-07-01"), length.out = 365, by = "1 day")
+        date_study <- seq(from = as.Date(start_date), length.out = 365, by = "1 day")
         date_reprise <- which(as.character(date_study) %in% as.character(dat$date_de_fin_sans_prolongation - days(1)))
         duree_prolongation_mean <- dat$duree_prolongation_mean[as.character(dat$date_de_fin_sans_prolongation) %in% as.character(date_study + days(1))]
         res <- matrix(
@@ -112,7 +119,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, law_planned
           }
         )
         
-        coef_clus <- get_clusters_coef(cluster, clusters_desc, kd_cho, "2018-07-01")
+        coef_clus <- get_clusters_coef(cluster, clusters_desc, kd_cho, start_date)
         date_study <- as.character(date_study)
         date_arret_prolongation <- unlist(date_arret_prolongation)
         fo_rate <- (!date_study %in% date_arret_prolongation) * (1 - coef_clus$kidispo_hqe)

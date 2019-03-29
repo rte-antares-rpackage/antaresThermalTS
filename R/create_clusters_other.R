@@ -2,7 +2,9 @@
 #' Create other clusters
 #'
 #' @param planning Calendar data read with \code{\link{read_calendar}}.
-#' @param infos Info
+#' @param infos Info about clusters read with \code{\link{read_info}}.
+#' @param start_date Starting date of the study, if \code{NULL} (default),
+#'  the date will be retrieve from the Antares study.
 #' @param opts
 #'   List of simulation parameters returned by the function
 #'   \code{setSimulationPath} 
@@ -14,7 +16,10 @@
 #' @importFrom lubridate hours days as_datetime
 #' @importFrom stats setNames
 #' @importFrom stringi stri_replace_all_regex
-create_clusters_other <- function(planning, infos, opts = simOptions()) {
+create_clusters_other <- function(planning, infos, start_date = NULL, opts = simOptions()) {
+  
+  if (is.null(start_date))
+    start_date <- format(opts$start, format = "%Y-%m-%d")
   
   planning <- copy(planning)
   planning[is.na(code_gp), code_gp := nom_site]
