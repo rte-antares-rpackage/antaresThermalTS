@@ -112,7 +112,8 @@ create_clusters_other <- function(planning, infos, start_date = NULL, opts = sim
       
       prepro_data = matrix(
         data = c(
-          rep(1, times = 365 * 2),
+          rep(7, times = 365 ),
+          rep(1, times = 365),
           rep(1 - infos_clus[["for"]], times = 365 * 1),
           rep(0, times = 365 * 2),
           rep(1, times = 365 * 1)
