@@ -16,7 +16,7 @@
 #' @importFrom antaresEditObject createCluster
 #' @importFrom lubridate hours days
 #' @importFrom stats setNames
-#' @importFrom stringr str_replace_all
+#' @importFrom stringi stri_replace_all_regex
 create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, law_planned = "geometric", volatility_planned = 1, opts = simOptions()) {
   
   # Modulation data
@@ -134,7 +134,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, law_planned
     opts <- createCluster(
       opts = opts,
       area = "area", 
-      cluster_name = str_replace_all(string = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
+      cluster_name = stri_replace_all_regex(string = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
       add_prefix = FALSE,
       group = "nuclear",
       unitcount = 1L,

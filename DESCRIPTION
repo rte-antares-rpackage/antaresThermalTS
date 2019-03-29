@@ -17,7 +17,6 @@ Imports:
     janitor,
     data.table,
     lubridate,
-    stringr,
     stringi,
     zoo
 RoxygenNote: 6.1.1

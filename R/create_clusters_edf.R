@@ -12,7 +12,7 @@
 #' @importFrom antaresEditObject createCluster
 #' @importFrom lubridate hours days as_datetime
 #' @importFrom stats setNames
-#' @importFrom stringr str_replace_all
+#' @importFrom stringi stri_replace_all_regex
 create_clusters_edf <- function(planning, opts = simOptions()) {
   
   planning <- copy(planning)
@@ -76,7 +76,7 @@ create_clusters_edf <- function(planning, opts = simOptions()) {
     opts <- createCluster(
       opts = opts,
       area = "area", 
-      cluster_name = str_replace_all(string = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
+      cluster_name = stri_replace_all_regex(string = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
       add_prefix = FALSE,
       group = cluster_infos[["group"]],
       unitcount = 1L,

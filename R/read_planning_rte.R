@@ -10,7 +10,7 @@
 #' @importFrom readxl read_excel cell_limits
 #' @importFrom janitor clean_names
 #' @importFrom data.table setDT copy :=
-#' @importFrom stringr str_replace_all
+#' @importFrom stringi stri_replace_all_regex
 read_planning_rte <- function(path, clusters_desc) {
   plan_rte <- read_excel(path = path, sheet = 1, range = cell_limits(c(8, 5), c(NA, NA)))
   plan_rte <- janitor::clean_names(plan_rte)
@@ -23,10 +23,10 @@ read_planning_rte <- function(path, clusters_desc) {
     y = corresp_gp,
     by = "groupe"
   )
-  plan_rte[, groupe := str_replace_all(groupe, "[:space:]", "")]
+  plan_rte[, groupe := stri_replace_all_regex(groupe, "[:space:]", "")]
   
   clusters_desc <- copy(clusters_desc)
-  clusters_desc[, nom := str_replace_all(nom, "[:space:]", "")]
+  clusters_desc[, nom := stri_replace_all_regex(nom, "[:space:]", "")]
   
   plan_rte <- merge(
     x = plan_rte, all.x = TRUE, all.y = FALSE, by = "groupe",
