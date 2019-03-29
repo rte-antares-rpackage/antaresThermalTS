@@ -16,6 +16,7 @@
 #' @importFrom lubridate hours days as_datetime
 #' @importFrom stats setNames
 #' @importFrom stringi stri_replace_all_regex
+#' @importFrom progress progress_bar
 create_clusters_other <- function(planning, infos, start_date = NULL, opts = simOptions()) {
   
   if (is.null(start_date))
@@ -33,11 +34,13 @@ create_clusters_other <- function(planning, infos, start_date = NULL, opts = sim
   infos[, pmax := as.numeric(pmax)]
   infos[is.na(pmax), pmax := 0]
   
+  unique_code_gp <- unique(planning$code_gp)
+  
   # Modulation data
   modulation_list <- lapply(
     X = setNames(
-      object = unique(planning$code_gp), 
-      nm = unique(planning$code_gp)
+      object = unique_code_gp, 
+      nm = unique_code_gp
     ),
     FUN = function(cluster) {
       dat <- planning[code_gp == cluster & !is.na(dt_debut_arret)]
@@ -81,7 +84,15 @@ create_clusters_other <- function(planning, infos, start_date = NULL, opts = sim
   )
   
   
-  for (cluster in unique(planning$code_gp)) {
+  pb <- progress_bar$new(
+    format = "  Creating thermal clusters [:bar] :percent",
+    total = length(unique_code_gp), clear = FALSE, width = 80
+  )
+  
+  
+  for (cluster in unique_code_gp) {
+    
+    pb$tick()
     
     code_group <- corr_groupe_descr(cluster)
     cluster_infos <- descr_clusters(code_group)
@@ -91,7 +102,7 @@ create_clusters_other <- function(planning, infos, start_date = NULL, opts = sim
     opts <- createCluster(
       opts = opts,
       area = "area", 
-      cluster_name = stri_replace_all_regex(string = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
+      cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
       add_prefix = FALSE,
       group = cluster_infos[["group"]],
       unitcount = 1L,

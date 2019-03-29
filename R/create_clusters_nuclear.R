@@ -19,6 +19,7 @@
 #' @importFrom lubridate hours days
 #' @importFrom stats setNames
 #' @importFrom stringi stri_replace_all_regex
+#' @importFrom progress progress_bar
 create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date = NULL, 
                                     law_planned = "geometric", volatility_planned = 1, opts = simOptions()) {
   
@@ -26,11 +27,13 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
     start_date <- format(opts$start, format = "%Y-%m-%d")
   
   
+  unique_tranches <- unique(calendar$tranche)
+  
   # Modulation data
   modulation_list <- lapply(
     X = setNames(
-      object = unique(calendar$tranche), 
-      nm = unique(calendar$tranche)
+      object = unique_tranches, 
+      nm = unique_tranches
     ),
     FUN = function(cluster) {
       dat <- calendar[tranche == cluster]
@@ -78,8 +81,8 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
   # Preprop data
   data_list <- lapply(
     X = setNames(
-      object = unique(calendar$tranche), 
-      nm = unique(calendar$tranche)
+      object = unique_tranches, 
+      nm = unique_tranches
     ),
     FUN = function(cluster) {
       dat <- calendar[tranche == cluster]
@@ -133,7 +136,14 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
     }
   )
   
-  for (cluster in unique(calendar$tranche)) {
+  pb <- progress_bar$new(
+    format = "  Creating nuclear clusters [:bar] :percent",
+    total = length(unique_tranches), clear = FALSE, width = 80
+  )
+  
+  for (cluster in unique_tranches) {
+    
+    pb$tick()
     
     code_pal <- clusters_desc[corresp_groupes == cluster, c(code_palier)]
     cluster_infos <- descr_clusters(paste0("nuclear_", code_pal))
@@ -141,7 +151,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
     opts <- createCluster(
       opts = opts,
       area = "area", 
-      cluster_name = stri_replace_all_regex(string = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
+      cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
       add_prefix = FALSE,
       group = "nuclear",
       unitcount = 1L,

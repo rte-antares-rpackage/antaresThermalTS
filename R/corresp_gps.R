@@ -12,5 +12,5 @@ corresp_gps <- function() {
   setnames(thermal, "name", "groupe")
   setnames(thermal, "code_groupe", "code_gp")
   setnames(thermal, "cluster_bp", "name_desc")
-  thermal[]
+  thermal[, list(groupe, code_gp, name_desc)][]
 }
