@@ -4,6 +4,7 @@
 #' @param planning Calendar data read with \code{\link{read_calendar}}.
 #' @param start_date Starting date of the study, if \code{NULL} (default),
 #'  the date will be retrieve from the Antares study.
+#' @param area_name Name of the area where to create clusters.
 #' @param opts
 #'   List of simulation parameters returned by the function
 #'   \code{setSimulationPath} 
@@ -16,16 +17,23 @@
 #' @importFrom stats setNames
 #' @importFrom stringi stri_replace_all_regex
 #' @importFrom progress progress_bar
-create_clusters_edf <- function(planning, start_date = NULL, opts = simOptions()) {
+create_clusters_edf <- function(planning, start_date = NULL, area_name = NULL, opts = simOptions()) {
   
   if (is.null(start_date))
     start_date <- format(opts$start, format = "%Y-%m-%d")
+  
+  area_name <- get_area_name(area_name)
   
   planning <- copy(planning)
   planning <- planning[!is.na(code_gp)]
   
   unique_code_gp <- unique(planning$code_gp)
 
+  pb <- progress_bar$new(
+    format = "  Preparing modulation data [:bar] :percent",
+    total = length(unique_code_gp), clear = FALSE
+  )
+  
   # Modulation data
   modulation_list <- lapply(
     X = setNames(
@@ -33,6 +41,7 @@ create_clusters_edf <- function(planning, start_date = NULL, opts = simOptions()
       nm = unique_code_gp
     ),
     FUN = function(cluster) {
+      pb$tick()
       dat <- planning[code_gp == cluster & !is.na(date_debut)]
       if (nrow(dat) == 0) {
         matrix(
@@ -76,7 +85,7 @@ create_clusters_edf <- function(planning, start_date = NULL, opts = simOptions()
   
   pb <- progress_bar$new(
     format = "  Creating thermal clusters [:bar] :percent",
-    total = length(unique_code_gp), clear = FALSE, width = 80
+    total = length(unique_code_gp), clear = FALSE
   )
   
   
@@ -91,9 +100,9 @@ create_clusters_edf <- function(planning, start_date = NULL, opts = simOptions()
     
     opts <- createCluster(
       opts = opts,
-      area = "area", 
+      area = area_name, 
       cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
-      add_prefix = FALSE,
+      add_prefix = TRUE,
       group = cluster_infos[["group"]],
       unitcount = 1L,
       nominalcapacity = floor(infos_clus$pcn_mw),

@@ -34,7 +34,7 @@ setup_study <- function(path, start_date = "2018-07-01", study_name = "prolongat
     opts = opts
   )
   
-  
+  options("antaresThermalTS.area_name" = area_name)
   if (!area_name %in% getAreas()) {
     opts <- createArea(name = area_name, opts = opts)
   }

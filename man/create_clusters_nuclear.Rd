@@ -5,7 +5,7 @@
 \title{Create nuclear clusters}
 \usage{
 create_clusters_nuclear(calendar, clusters_desc, kd_cho,
-  start_date = NULL, law_planned = "geometric",
+  start_date = NULL, area_name = NULL, law_planned = "geometric",
   volatility_planned = 1, opts = simOptions())
 }
 \arguments{
@@ -17,6 +17,8 @@ create_clusters_nuclear(calendar, clusters_desc, kd_cho,
 
 \item{start_date}{Starting date of the study, if \code{NULL} (default),
 the date will be retrieve from the Antares study.}
+
+\item{area_name}{Name of the area where to create clusters.}
 
 \item{law_planned}{Law to use in Antares.}
 

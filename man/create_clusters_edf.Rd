@@ -4,13 +4,16 @@
 \alias{create_clusters_edf}
 \title{Create EDF clusters}
 \usage{
-create_clusters_edf(planning, start_date = NULL, opts = simOptions())
+create_clusters_edf(planning, start_date = NULL, area_name = NULL,
+  opts = simOptions())
 }
 \arguments{
 \item{planning}{Calendar data read with \code{\link{read_calendar}}.}
 
 \item{start_date}{Starting date of the study, if \code{NULL} (default),
 the date will be retrieve from the Antares study.}
+
+\item{area_name}{Name of the area where to create clusters.}
 
 \item{opts}{List of simulation parameters returned by the function
 \code{setSimulationPath}}

@@ -6,6 +6,7 @@
 #' @param kd_cho Kd coefficients read with \code{\link{read_kd_cho}}.
 #' @param start_date Starting date of the study, if \code{NULL} (default),
 #'  the date will be retrieve from the Antares study.
+#' @param area_name Name of the area where to create clusters.
 #' @param law_planned Law to use in Antares.
 #' @param volatility_planned Volatility for the law.
 #' @param opts
@@ -20,14 +21,20 @@
 #' @importFrom stats setNames
 #' @importFrom stringi stri_replace_all_regex
 #' @importFrom progress progress_bar
-create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date = NULL, 
+create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date = NULL, area_name = NULL, 
                                     law_planned = "geometric", volatility_planned = 1, opts = simOptions()) {
   
   if (is.null(start_date))
     start_date <- format(opts$start, format = "%Y-%m-%d")
   
+  area_name <- get_area_name(area_name)
   
   unique_tranches <- unique(calendar$tranche)
+  
+  pb <- progress_bar$new(
+    format = "  Preparing modulation data [:bar] :percent",
+    total = length(unique_tranches), clear = FALSE
+  )
   
   # Modulation data
   modulation_list <- lapply(
@@ -36,6 +43,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
       nm = unique_tranches
     ),
     FUN = function(cluster) {
+      pb$tick()
       dat <- calendar[tranche == cluster]
       if (nrow(dat) == 0) {
         matrix(
@@ -77,6 +85,11 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
       }
     }
   )
+  
+  pb <- progress_bar$new(
+    format = "  Preparing TS data [:bar] :percent",
+    total = length(unique_tranches), clear = FALSE
+  )
 
   # Preprop data
   data_list <- lapply(
@@ -85,6 +98,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
       nm = unique_tranches
     ),
     FUN = function(cluster) {
+      pb$tick()
       dat <- calendar[tranche == cluster]
       if (nrow(dat) == 0) {
         matrix(
@@ -138,7 +152,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
   
   pb <- progress_bar$new(
     format = "  Creating nuclear clusters [:bar] :percent",
-    total = length(unique_tranches), clear = FALSE, width = 80
+    total = length(unique_tranches), clear = FALSE
   )
   
   for (cluster in unique_tranches) {
@@ -150,9 +164,9 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
     
     opts <- createCluster(
       opts = opts,
-      area = "area", 
+      area = area_name, 
       cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"), 
-      add_prefix = FALSE,
+      add_prefix = TRUE,
       group = "nuclear",
       unitcount = 1L,
       nominalcapacity = clusters_desc[corresp_groupes == cluster, c(pcn_mw)],

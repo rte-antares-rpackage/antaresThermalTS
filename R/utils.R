@@ -12,3 +12,14 @@ n_overlaps <- function(w1, w2, s1, s2) {
   x4 <- (as.numeric(s2 - s1) + 1) * (s1 > w1 & s2 < w2)
   x1 + x2 + x3 + x4
 }
+
+
+get_area_name <- function(area = NULL) {
+  if (!is.null(area))
+    return(area)
+  area <- getOption("antaresThermalTS.area_name")
+  if (is.null(area))
+    stop("Please provide the area to use for creating clusters", call. = FALSE)
+  area
+}
+
