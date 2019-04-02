@@ -5,7 +5,8 @@
 \title{Create an (empty) Antares study for Extended Shutdown Simulation}
 \usage{
 setup_study(path, start_date = "2018-07-01",
-  study_name = "prolongation-arrets", area_name = "area")
+  study_name = "prolongation-arrets", area_name = "fr",
+  keep_clusters = "fr_dsr_long")
 }
 \arguments{
 \item{path}{Path to an Antares study or to a directory for creating one.}
@@ -14,7 +15,9 @@ setup_study(path, start_date = "2018-07-01",
 
 \item{study_name}{Name of the study.}
 
-\item{area_name}{Name of the area to create}
+\item{area_name}{Name of the area to create or use.}
+
+\item{keep_clusters}{For an existing study, a character vector of clusters to keep, all others will be removed.}
 }
 \description{
 Create an (empty) Antares study for Extended Shutdown Simulation

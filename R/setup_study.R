@@ -4,14 +4,18 @@
 #' @param path Path to an Antares study or to a directory for creating one.
 #' @param start_date Starting date for the study.
 #' @param study_name Name of the study.
-#' @param area_name Name of the area to create
+#' @param area_name Name of the area to create or use.
+#' @param keep_clusters For an existing study, a character vector of clusters to keep, all others will be removed.
 #'
 #' @export
 #'
-#' @importFrom antaresEditObject createStudy updateGeneralSettings createArea
-#' @importFrom antaresRead setSimulationPath getAreas
+#' @importFrom antaresEditObject createStudy updateGeneralSettings createArea removeCluster
+#' @importFrom antaresRead setSimulationPath getAreas readClusterDesc
 #' @importFrom lubridate month wday year as_date
-setup_study <- function(path, start_date = "2018-07-01", study_name = "prolongation-arrets", area_name = "area") {
+setup_study <- function(path, start_date = "2018-07-01", 
+                        study_name = "prolongation-arrets", 
+                        area_name = "fr",
+                        keep_clusters = "fr_dsr_long") {
   
   if (!dir.exists(path)) {
     createStudy(path = path, study_name = study_name)
@@ -37,6 +41,14 @@ setup_study <- function(path, start_date = "2018-07-01", study_name = "prolongat
   options("antaresThermalTS.area_name" = area_name)
   if (!area_name %in% getAreas()) {
     opts <- createArea(name = area_name, opts = opts)
+  }
+  
+  clus <- readClusterDesc()[area == area_name, as.character(cluster)]
+  if (length(clus) > 0) {
+    clus <- setdiff(clus, keep_clusters)
+    for (i in clus) {
+      opts <- removeCluster(area = area_name, cluster_name = clus, add_prefix = FALSE, opts = opts)
+    }
   }
 
   invisible(opts)
