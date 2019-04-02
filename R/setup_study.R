@@ -6,16 +6,18 @@
 #' @param study_name Name of the study.
 #' @param area_name Name of the area to create or use.
 #' @param keep_clusters For an existing study, a character vector of clusters to keep, all others will be removed.
+#' @param nb_ts_thermal Number of thermal timeseries to set.
 #'
 #' @export
 #'
-#' @importFrom antaresEditObject createStudy updateGeneralSettings createArea removeCluster
+#' @importFrom antaresEditObject createStudy updateGeneralSettings createArea removeCluster updateInputSettings
 #' @importFrom antaresRead setSimulationPath getAreas readClusterDesc
 #' @importFrom lubridate month wday year as_date
 setup_study <- function(path, start_date = "2018-07-01", 
                         study_name = "prolongation-arrets", 
                         area_name = "fr",
-                        keep_clusters = "fr_dsr_long") {
+                        keep_clusters = "fr_dsr_long",
+                        nb_ts_thermal = 1000) {
   
   if (!dir.exists(path)) {
     createStudy(path = path, study_name = study_name)
@@ -50,6 +52,17 @@ setup_study <- function(path, start_date = "2018-07-01",
       opts <- removeCluster(area = area_name, cluster_name = clus, add_prefix = FALSE, opts = opts)
     }
   }
+  
+  opts <- updateGeneralSettings(
+    generate = "thermal",
+    nbtimeseriesthermal = nb_ts_thermal,
+    refreshtimeseries = "",
+    readonly = FALSE
+  )
+  
+  opts <- updateInputSettings(
+    import = "thermal"
+  )
 
   invisible(opts)
 }
