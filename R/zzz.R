@@ -7,4 +7,5 @@ utils::globalVariables(c("tranche", "date_de_fin_avec_prolongation", "date_de_fi
                          "week_end", "week_start", "group_power", "abat_rso", "type_darret", "pmin_mw",
                          "n_sem_annee", "kif", "kistretch", "kienv", "kihiver", "kibouclage", "code_palier", "palier",
                          "code_gp", "dt_debut_arret", "edp_ed_prev", "nom_site", "date_fin_arret",
-                         "code_groupe", "date_fin_arret", "groupe", "name_desc", "cluster", "area"))
+                         "code_groupe", "date_fin_arret", "groupe", "name_desc", "cluster", "area",
+                         "code", "kp_value"))

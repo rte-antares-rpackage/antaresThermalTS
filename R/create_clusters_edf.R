@@ -138,3 +138,71 @@ create_clusters_edf <- function(planning, start_date = NULL, area_name = NULL, o
 }
 
 
+
+
+
+
+#' @importFrom data.table data.table rbindlist melt
+#' @importFrom lubridate years
+#' @importFrom stringi stri_extract
+get_fo_rate_edf <- function(edf, code_groupe, date_study) {
+  
+  kp <- c("kp_2019_hors_ete", 
+          "kp_2019_ete", 
+          "kp_2020_hors_ete",
+          "kp_2020_ete", 
+          "kp_2021_hors_ete", 
+          "kp_2021_ete")
+  
+  coresp_kp_week <- lapply(
+    X = kp,
+    FUN = function(x) {
+      YEAR <- stri_extract(str = x, regex = "\\d{4}")
+      YEAR <- as.numeric(YEAR)
+      WEEKS <- 25:37
+      if (grepl(pattern = "hors_ete", x = x)) {
+        WEEKS <- (1:52)[-c(25:37)]
+        YEAR <- rep(YEAR, length(WEEKS))
+        YEAR[(38:52) - length(25:37)] <- YEAR[1] - 1
+      } else {
+        YEAR <- rep(YEAR, length(WEEKS))
+      }
+      data.table(week = sprintf("S%02d - %s", WEEKS, YEAR))
+    }
+  )
+  names(coresp_kp_week) <- kp
+  coresp_kp_week <- rbindlist(coresp_kp_week, idcol = "kp_period")
+  
+  
+  edf_gp <- unique(edf[code_gp == code_groupe], by = "code_gp")
+  
+  kp <- c("kp_2019_hors_ete", 
+          "kp_2019_ete", 
+          "kp_2020_hors_ete",
+          "kp_2020_ete", 
+          "kp_2021_hors_ete", 
+          "kp_2021_ete")
+  edf_gp <- melt(
+    data = edf_gp, 
+    id.vars = "code_gp",
+    measure.vars = kp, 
+    variable.factor = FALSE, 
+    variable.name = "kp_period",
+    value.name = "kp_value"
+  )
+  edf_gp <- merge(x = coresp_kp_week, y = edf_gp)
+  edf_gp <- merge(x = edf_gp, y = build_weekcal(), by = "week")
+  
+  edf_gp <- edf_gp[rep(seq_len(.N), each = 7)]
+  edf_gp[, num_seq := seq_len(.N) - 1, by = week]
+  edf_gp[, date := week_start + num_seq]
+  
+  edf_gp <- edf_gp[date >= as.Date(date_study) & date < as.Date(date_study) + years(1)]
+  
+  edf_gp <- edf_gp[order(date), list(date, kp_value)]
+  
+  edf_gp[]
+}
+
+
+
