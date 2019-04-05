@@ -4,11 +4,13 @@
 \alias{create_clusters_edf}
 \title{Create EDF clusters}
 \usage{
-create_clusters_edf(planning, start_date = NULL, area_name = NULL,
-  opts = simOptions())
+create_clusters_edf(planning, hypothesis, start_date = NULL,
+  area_name = NULL, opts = simOptions())
 }
 \arguments{
 \item{planning}{Calendar data read with \code{\link{read_calendar}}.}
+
+\item{hypothesis}{Kp coefficients read with \code{\link{read_kp_edf}}.}
 
 \item{start_date}{Starting date of the study, if \code{NULL} (default),
 the date will be retrieve from the Antares study.}

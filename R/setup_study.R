@@ -45,8 +45,9 @@ setup_study <- function(path, start_date = "2018-07-01",
     opts <- createArea(name = area_name, opts = opts)
   }
   
-  clus <- readClusterDesc()[area == area_name, as.character(cluster)]
-  if (length(clus) > 0) {
+  clus <- try(readClusterDesc(), silent = TRUE)
+  if (!inherits(clus, "try-error") && length(clus) > 0) {
+    clus <- clus[area == area_name, as.character(cluster)]
     clus <- setdiff(clus, keep_clusters)
     for (i in clus) {
       opts <- removeCluster(area = area_name, cluster_name = clus, add_prefix = FALSE, opts = opts)

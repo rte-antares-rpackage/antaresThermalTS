@@ -44,6 +44,7 @@ read_kd_edf <- function(path) {
 #' @importFrom readxl read_excel anchored cell_limits
 #' @importFrom janitor clean_names
 #' @importFrom data.table setDT setnames
+#' @importFrom stringi stri_replace
 #'
 read_kp_edf <- function(path) {
   kp_edf <- read_excel(
@@ -53,10 +54,21 @@ read_kp_edf <- function(path) {
   kp_edf <- clean_names(kp_edf)
   setDT(kp_edf)
 
+  
   clusters_desc <- read_cluster_desc(path = path)
   
   kp_edf <- merge(x = kp_edf, y = clusters_desc[, list(nom, corresp_groupes, pcn_mw, pmin_mw)], by = "nom")
-  setnames(kp_edf, "corresp_groupes", "code_gp")
+  
+  setnames(kp_edf, "nom", "groupe")
+  kp_edf[, groupe := stri_replace(str = groupe, regex = "(?<=[:alpha:])(\\d)", replacement = " $1")]
+  corresp_gp <- corresp_gps()
+  kp_edf <- merge(
+    x = kp_edf,
+    y = corresp_gp,
+    by = "groupe"
+  )
+  kp_edf[, groupe := stri_replace_all_regex(groupe, "[:space:]", "")]
+  
   kp_edf[]
 }
 

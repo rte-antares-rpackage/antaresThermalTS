@@ -2,6 +2,7 @@
 #' Create EDF clusters
 #'
 #' @param planning Calendar data read with \code{\link{read_calendar}}.
+#' @param hypothesis Kp coefficients read with \code{\link{read_kp_edf}}.
 #' @param start_date Starting date of the study, if \code{NULL} (default),
 #'  the date will be retrieve from the Antares study.
 #' @param area_name Name of the area where to create clusters.
@@ -17,7 +18,8 @@
 #' @importFrom stats setNames
 #' @importFrom stringi stri_replace_all_regex
 #' @importFrom progress progress_bar
-create_clusters_edf <- function(planning, start_date = NULL, area_name = NULL, opts = simOptions()) {
+#' @importFrom utils head
+create_clusters_edf <- function(planning, hypothesis, start_date = NULL, area_name = NULL, opts = simOptions()) {
   
   if (is.null(start_date))
     start_date <- format(opts$start, format = "%Y-%m-%d")
@@ -26,6 +28,12 @@ create_clusters_edf <- function(planning, start_date = NULL, area_name = NULL, o
   
   planning <- copy(planning)
   planning <- planning[!is.na(code_gp)]
+  
+  hypothesis <- copy(hypothesis)
+  hypothesis <- hypothesis[!is.na(code_gp)]
+  
+  # remove AGP shutdown
+  planning <- planning[type_darret != "AGP"]
   
   unique_code_gp <- unique(planning$code_gp)
 
@@ -81,6 +89,34 @@ create_clusters_edf <- function(planning, start_date = NULL, area_name = NULL, o
       }
     }
   )
+
+  pb <- progress_bar$new(
+    format = "  Preparing prepro data [:bar] :percent",
+    total = length(unique_code_gp), clear = FALSE
+  )
+  
+  
+  data_list <- lapply(
+    X = setNames(
+      object = unique_code_gp, 
+      nm = unique_code_gp
+    ),
+    FUN = function(cluster) {
+      pb$tick()
+      fo_rate <- get_fo_rate_edf(edf = hypothesis, code_groupe = cluster, date_study = start_date)
+      fo_rate <- head(fo_rate$kp_value, 365)
+      matrix(
+        data = c(
+          rep(7, times = 365),
+          rep(1, times = 365),
+          1 - fo_rate,
+          rep(0, times = 365 * 2),
+          rep(1, times = 365 * 1)
+        ),
+        ncol = 6
+      )
+    }
+  )
   
   
   pb <- progress_bar$new(
@@ -120,16 +156,7 @@ create_clusters_edf <- function(planning, start_date = NULL, area_name = NULL, o
       `market-bid-cost` = cluster_infos[["market-bid-cost"]],
       co2 = cluster_infos[["co2"]],
       
-      prepro_data = matrix(
-        data = c(
-          rep(7, times = 365 ),
-          rep(1, times = 365),
-          rep(1 - 0.5, times = 365 * 1),
-          rep(0, times = 365 * 2),
-          rep(1, times = 365 * 1)
-        ),
-        ncol = 6
-      ),
+      prepro_data = data_list[[cluster]],
       prepro_modulation = modulation_list[[cluster]]
     )
   }
@@ -200,6 +227,8 @@ get_fo_rate_edf <- function(edf, code_groupe, date_study) {
   edf_gp <- edf_gp[date >= as.Date(date_study) & date < as.Date(date_study) + years(1)]
   
   edf_gp <- edf_gp[order(date), list(date, kp_value)]
+  
+  edf_gp[, kp_value := as.numeric(kp_value) / 100]
   
   edf_gp[]
 }
