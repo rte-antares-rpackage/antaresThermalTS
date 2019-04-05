@@ -28,3 +28,36 @@ read_kd_edf <- function(path) {
   merge(x = kd_edf, y = infos_edf, by = "code_gp", all = FALSE)
   
 }
+
+
+
+
+
+
+#' Read Kp coefficents for EDF clusters
+#'
+#' @param path Path to Excel file.
+#'
+#' @return a \code{data.table}
+#' @export
+#' 
+#' @importFrom readxl read_excel anchored cell_limits
+#' @importFrom janitor clean_names
+#' @importFrom data.table setDT setnames
+#'
+read_kp_edf <- function(path) {
+  kp_edf <- read_excel(
+    path = path,
+    sheet = "Kp classique", range = anchored("C10", dim = c(NA, 7))
+  )
+  kp_edf <- clean_names(kp_edf)
+  setDT(kp_edf)
+
+  clusters_desc <- read_cluster_desc(path = path)
+  
+  kp_edf <- merge(x = kp_edf, y = clusters_desc[, list(nom, corresp_groupes, pcn_mw, pmin_mw)], by = "nom")
+  setnames(kp_edf, "corresp_groupes", "code_gp")
+  kp_edf[]
+}
+
+
