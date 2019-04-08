@@ -27,7 +27,7 @@ read_planning <- function(path, sheet = "Planning", start_col = "A", start_row =
 
   data <- read_excel(
     path = path,
-    sheet = sheet,
+    sheet = sheet, na = c("", "NA"),
     range = anchored(anchor = paste0(start_col, start_row + 1), dim = c(NA, 12)),
     col_names = c("nom_site", "num_tranche", "code_gp", "pcn_mw",
                   "dt_debut_arret", "dt_fin_arret",
@@ -53,4 +53,13 @@ read_planning <- function(path, sheet = "Planning", start_col = "A", start_row =
   # remove empty rows
   data2 <- data[, setdiff(names(data), first_cols), with = FALSE]
   data <- data[rowSums(is.na(data2)) != ncol(data2), ]
+  
+  # correctif gdf
+  new_code_gp <- data.table(
+    code_gp = c("GRACIT 1", "FOSCCT1" , "DK6 TAG1", "DK6 TAV1", "DK6 TAG2", "DK6 TAV2", "G.RIVT 1", "FOSCHT2" , "BILHOT"),
+    new_code_gp = c("GRACIT 1", "FOSCCT 1" , "DK6 TG1", "DK6 TV1", "DK6 TG2", "DK6 TV2", "G.RIVT 1", "FOSCHT 2" , "BILHOT01")
+  )
+  
+  data[new_code_gp, on = list(nom_site = code_gp), code_gp := new_code_gp]
+  data[]
 }

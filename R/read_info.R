@@ -38,5 +38,18 @@ read_info <- function(path) {
   clus_infos <- unique(clus_infos, by = "edp_ed_prev")
   clus_infos <- clus_infos[edp_ed_prev != "EDP"]
   clus_infos[code_gp == "MORANT 1" & is.na(pmin), pmin := 190]
+  
+  clus_infos <- clus_infos[!is.na(code_gp)]
+  
+  # correctif gdf
+  new_code_gp <- data.table(
+    code_gp = c("GRACIT 1", "FOSCCT1" , "DK6 TAG1", "DK6 TAV1", "DK6 TAG2", "DK6 TAV2", "G.RIVT 1", "FOSCHT2" , "BILHOT"),
+    new_code_gp = c("GRACIT 1", "FOSCCT 1" , "DK6 TG1", "DK6 TV1", "DK6 TG2", "DK6 TV2", "G.RIVT 1", "FOSCHT 2" , "BILHOT01")
+  )
+  
+  clus_infos[new_code_gp, on = list(code_gp = code_gp), code_gp := new_code_gp]
+  
+  clus_infos <- merge(x = clus_infos, y = corresp_gps(), by = "code_gp", all.x = TRUE)
+  
   clus_infos[]
 }
