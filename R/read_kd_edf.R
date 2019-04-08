@@ -69,6 +69,9 @@ read_kp_edf <- function(path) {
   )
   kp_edf[, groupe := stri_replace_all_regex(groupe, "[:space:]", "")]
   
+  cols_kp <- grep("kp_\\d{4}.*", names(kp_edf), value = TRUE)
+  kp_edf[, (cols_kp) := lapply(.SD, as.numeric), .SDcols = cols_kp]
+  
   kp_edf[]
 }
 
