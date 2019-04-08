@@ -117,7 +117,7 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
     
     if (!is.null(hypothesis) && isTRUE(infos_clus[["name_desc"]] %in% hypothesis$name_desc)) {
       fo_rate <- get_fo_rate_edf(edf = kp, code_groupe = infos_clus[["name_desc"]], date_study = start_date)
-      fo_rate <- head(fo_rate$kp_value, 365)
+      fo_rate <- 1 - head(fo_rate$kp_value, 365)
     } else {
       fo_rate <- rep(1 - infos_clus[["for"]], times = 365)
     }
