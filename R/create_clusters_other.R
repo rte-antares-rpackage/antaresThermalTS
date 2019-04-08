@@ -64,7 +64,7 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
           ncol = 4
         )
       } else {
-        datetime_study <- seq(from = as.POSIXct("2018-07-01", tz = "UTC"), length.out = 8760, by = "1 hour")
+        datetime_study <- seq(from = as.POSIXct(start_date, tz = "UTC"), length.out = 8760, by = "1 hour")
         datetime_study <- as.character(datetime_study)
         datetime_prolongation <- lapply(
           X = seq_len(nrow(dat)), 
