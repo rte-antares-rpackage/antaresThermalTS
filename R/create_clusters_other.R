@@ -3,6 +3,7 @@
 #'
 #' @param planning Calendar data read with \code{\link{read_calendar}}.
 #' @param infos Info about clusters read with \code{\link{read_info}}.
+#' @param hypothesis Kp coefficients read with \code{\link{read_kp_edf}}. If not \code{NULL}, used to compute FO rate.
 #' @param start_date Starting date of the study, if \code{NULL} (default),
 #'  the date will be retrieve from the Antares study.
 #' @param area_name Name of the area where to create clusters.
@@ -18,7 +19,8 @@
 #' @importFrom stats setNames
 #' @importFrom stringi stri_replace_all_regex
 #' @importFrom progress progress_bar
-create_clusters_other <- function(planning, infos, start_date = NULL, area_name = NULL, opts = simOptions()) {
+#' @importFrom utils head
+create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date = NULL, area_name = NULL, opts = simOptions()) {
   
   if (is.null(start_date))
     start_date <- format(opts$start, format = "%Y-%m-%d")
@@ -37,7 +39,7 @@ create_clusters_other <- function(planning, infos, start_date = NULL, area_name 
   infos[, pmax := as.numeric(pmax)]
   infos[is.na(pmax), pmax := 0]
   
-  unique_code_gp <- unique(planning$code_gp)
+  unique_code_gp <- unique(intersect(planning$code_gp, infos$code_gp))
   
   pb <- progress_bar$new(
     format = "  Preparing modulation data [:bar] :percent",
@@ -99,14 +101,26 @@ create_clusters_other <- function(planning, infos, start_date = NULL, area_name 
   )
   
   
+  if (!is.null(hypothesis)) {
+    cols_kp <- grep("kp_\\d{4}.*", names(hypothesis), value = TRUE)
+    kp <- hypothesis[, lapply(.SD, mean, na.rm = TRUE), by = list(code_gp = name_desc), .SDcols = cols_kp]
+  }
+  
+  
   for (cluster in unique_code_gp) {
     
     pb$tick()
     
-    code_group <- corr_groupe_descr(cluster)
-    cluster_infos <- descr_clusters(code_group)
-    
     infos_clus <- infos[code_gp == cluster]
+    
+    cluster_infos <- descr_clusters(infos_clus[["name_desc"]])
+    
+    if (!is.null(hypothesis) && isTRUE(infos_clus[["name_desc"]] %in% hypothesis$name_desc)) {
+      fo_rate <- get_fo_rate_edf(edf = kp, code_groupe = infos_clus[["name_desc"]], date_study = start_date)
+      fo_rate <- head(fo_rate$kp_value, 365)
+    } else {
+      fo_rate <- rep(1 - infos_clus[["for"]], times = 365)
+    }
     
     opts <- createCluster(
       opts = opts,
@@ -134,7 +148,7 @@ create_clusters_other <- function(planning, infos, start_date = NULL, area_name 
         data = c(
           rep(7, times = 365 ),
           rep(1, times = 365),
-          rep(1 - infos_clus[["for"]], times = 365 * 1),
+          fo_rate,
           rep(0, times = 365 * 2),
           rep(1, times = 365 * 1)
         ),

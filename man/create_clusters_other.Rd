@@ -4,13 +4,15 @@
 \alias{create_clusters_other}
 \title{Create other clusters}
 \usage{
-create_clusters_other(planning, infos, start_date = NULL,
-  area_name = NULL, opts = simOptions())
+create_clusters_other(planning, infos, hypothesis = NULL,
+  start_date = NULL, area_name = NULL, opts = simOptions())
 }
 \arguments{
 \item{planning}{Calendar data read with \code{\link{read_calendar}}.}
 
 \item{infos}{Info about clusters read with \code{\link{read_info}}.}
+
+\item{hypothesis}{Kp coefficients read with \code{\link{read_kp_edf}}. If not \code{NULL}, used to compute FO rate.}
 
 \item{start_date}{Starting date of the study, if \code{NULL} (default),
 the date will be retrieve from the Antares study.}
