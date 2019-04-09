@@ -40,6 +40,12 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
   infos[is.na(pmax), pmax := 0]
   
   unique_code_gp <- unique(intersect(planning$code_gp, infos$code_gp))
+  code_gp_rm <- setdiff(union(planning$code_gp, infos$code_gp), unique_code_gp)
+  if (length(code_gp_rm) > 0) {
+    warning(paste(
+      "These clusters have been removed:", paste(code_gp_rm, collapse = ", "), "(not on both planning & info files)"
+    ), call. = FALSE)
+  }
   
   pb <- progress_bar$new(
     format = "  Preparing modulation data [:bar] :percent",

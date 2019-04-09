@@ -12,7 +12,7 @@
 #'
 #' @importFrom antaresEditObject createStudy updateGeneralSettings createArea removeCluster updateInputSettings
 #' @importFrom antaresRead setSimulationPath getAreas readClusterDesc
-#' @importFrom lubridate month wday year as_date
+#' @importFrom lubridate month wday year as_date leap_year
 setup_study <- function(path, start_date = "2018-07-01", 
                         study_name = "prolongation-arrets", 
                         area_name = "fr",
@@ -37,6 +37,7 @@ setup_study <- function(path, start_date = "2018-07-01",
     first.weekday = "Sunday",
     january.1st = as.character(january.1st),
     horizon = paste(year(start_date), year(start_date) + 1, sep = "-"), 
+    leapyear = leap_year(year(start_date) + 1),
     opts = opts
   )
   
