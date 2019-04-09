@@ -27,6 +27,8 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
   
   area_name <- get_area_name(area_name)
   
+  n_days <- if (is_leapyear(opts)) 366 else 365
+  
   planning <- copy(planning)
   planning[is.na(code_gp), code_gp := nom_site]
   
@@ -123,10 +125,10 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
     
     if (!is.null(hypothesis) && isTRUE(infos_clus[["name_desc"]] %in% hypothesis$name_desc)) {
       fo_rate <- get_fo_rate_edf(edf = kp, code_groupe = infos_clus[["name_desc"]], date_study = start_date)
-      fo_rate <- 1 - head(fo_rate$kp_value, 365)
+      fo_rate <- 1 - head(fo_rate$kp_value, n_days)
     } else {
       # fo_rate <- rep(1 - infos_clus[["for"]], times = 365)
-      fo_rate <- rep(0.05, times = 365)
+      fo_rate <- rep(0.05, times = n_days)
     }
     
     opts <- createCluster(
@@ -153,11 +155,11 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
       
       prepro_data = matrix(
         data = c(
-          rep(7, times = 365 ),
-          rep(1, times = 365),
+          rep(7, times = n_days ),
+          rep(1, times = n_days),
           fo_rate,
-          rep(0, times = 365 * 2),
-          rep(1, times = 365 * 1)
+          rep(0, times = n_days * 2),
+          rep(1, times = n_days * 1)
         ),
         ncol = 6
       ),

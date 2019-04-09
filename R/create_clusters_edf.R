@@ -26,6 +26,8 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL, area_na
   
   area_name <- get_area_name(area_name)
   
+  n_days <- if (is_leapyear(opts)) 366 else 365
+  
   planning <- copy(planning)
   planning <- planning[!is.na(code_gp)]
   
@@ -104,14 +106,14 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL, area_na
     FUN = function(cluster) {
       pb$tick()
       fo_rate <- get_fo_rate_edf(edf = hypothesis, code_groupe = cluster, date_study = start_date)
-      fo_rate <- head(fo_rate$kp_value, 365)
+      fo_rate <- head(fo_rate$kp_value, n_days)
       matrix(
         data = c(
-          rep(7, times = 365),
-          rep(1, times = 365),
+          rep(7, times = n_days),
+          rep(1, times = n_days),
           1 - fo_rate,
-          rep(0, times = 365 * 2),
-          rep(1, times = 365 * 1)
+          rep(0, times = n_days * 2),
+          rep(1, times = n_days * 1)
         ),
         ncol = 6
       )
