@@ -195,7 +195,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
   invisible(opts)
 }
 
-
+#' @importFrom data.table setorder
 #' @importFrom lubridate years year
 get_clusters_coef <- function(name, clusters_desc, kd_cho, date_study) {
   code_pal <- clusters_desc[corresp_groupes == name, c(code_palier)]
@@ -213,6 +213,7 @@ get_clusters_coef <- function(name, clusters_desc, kd_cho, date_study) {
   coefkd_week[, week_start := week_start + num_seq]
   coefkd_week <- coefkd_week[, list(date = week_start, abat_rso, kidispo_hqe)]
   coefkd_week <- coefkd_week[date >= date_study & date < date_study + lubridate::years(1)]
+  setorder(coefkd_week, date)
   coefkd_week[]
 }
 
