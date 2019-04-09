@@ -130,7 +130,8 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
             if (dat$date_de_fin_sans_prolongation[i] > dat$date_debut[i]) {
               res <- seq(
                 from = as.Date(dat$date_debut[i]), 
-                to = as.Date(dat$date_de_fin_avec_prolongation[i]) - days(1), 
+                # to = as.Date(dat$date_de_fin_avec_prolongation[i]) - days(1), 
+                to = as.Date(dat$date_de_fin_sans_prolongation[i]) + days(dat$duree_prolongation_mean[i] - 1) - days(1), 
                 by = "1 day"
               )
               as.character(res)
