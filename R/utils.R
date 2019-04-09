@@ -23,3 +23,13 @@ get_area_name <- function(area = NULL) {
   area
 }
 
+
+is_leapyear <- function(opts = NULL) {
+  if (is.null(opts)) {
+    isTRUE(getOption("antares")$parameters$general$leapyear)
+  } else {
+    isTRUE(opts$parameters$general$leapyear)
+  }
+}
+
+

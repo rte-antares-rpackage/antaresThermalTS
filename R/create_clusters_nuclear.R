@@ -31,6 +31,8 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
   
   unique_tranches <- unique(calendar$tranche)
   
+  n_days <- if (is_leapyear(opts)) 366 else 365
+  
   pb <- progress_bar$new(
     format = "  Preparing modulation data [:bar] :percent",
     total = length(unique_tranches), clear = FALSE
@@ -103,21 +105,21 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
       if (nrow(dat) == 0) {
         matrix(
           data = c(
-            rep(1, times = 365 * 2),
-            rep(0, times = 365 * 3),
-            rep(1, times = 365 * 1)
+            rep(1, times = n_days * 2),
+            rep(0, times = n_days * 3),
+            rep(1, times = n_days * 1)
           ),
           ncol = 6
         )
       } else {
-        date_study <- seq(from = as.Date(start_date), length.out = 365, by = "1 day")
+        date_study <- seq(from = as.Date(start_date), length.out = n_days, by = "1 day")
         date_reprise <- which(as.character(date_study) %in% as.character(dat$date_de_fin_sans_prolongation - days(1)))
         duree_prolongation_mean <- dat$duree_prolongation_mean[as.character(dat$date_de_fin_sans_prolongation) %in% as.character(date_study + days(1))]
         res <- matrix(
           data = c(
-            rep(1, times = 365 * 2),
-            rep(0, times = 365 * 3),
-            rep(1, times = 365 * 1)
+            rep(1, times = n_days * 2),
+            rep(0, times = n_days * 3),
+            rep(1, times = n_days * 1)
           ),
           ncol = 6
         )
@@ -141,7 +143,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
         date_arret_prolongation <- unlist(date_arret_prolongation)
         fo_rate <- (!date_study %in% date_arret_prolongation) * (1 - coef_clus$kidispo_hqe)
         
-        res[, 3] <- fo_rate
+        res[, 3] <- head(fo_rate, n = n_days)
         
         res[date_reprise, 2] <- duree_prolongation_mean
         res[date_reprise, 4] <- 1
@@ -194,18 +196,23 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
 }
 
 
-#' @importFrom lubridate years
+#' @importFrom lubridate years year
 get_clusters_coef <- function(name, clusters_desc, kd_cho, date_study) {
   code_pal <- clusters_desc[corresp_groupes == name, c(code_palier)]
   coefkd_week <- kd_cho[code_palier %in% code_pal, list(week = n_sem_annee, abat_rso, kidispo_hqe)]
   
-  coefkd_week <- merge(x = coefkd_week, y = build_weekcal(), all.x = TRUE, all.y = FALSE)
+  date_study <- as.Date(date_study)
+  coefkd_week <- merge(
+    x = coefkd_week,
+    y = build_weekcal(start = year(date_study), end = year(date_study) + 2), 
+    all.x = TRUE, all.y = FALSE
+  )
   
   coefkd_week <- coefkd_week[rep(seq_len(.N), each = 7)]
   coefkd_week[, num_seq := seq_len(.N) - 1, by = week]
   coefkd_week[, week_start := week_start + num_seq]
   coefkd_week <- coefkd_week[, list(date = week_start, abat_rso, kidispo_hqe)]
-  coefkd_week <- coefkd_week[date >= as.Date(date_study) & date < as.Date(date_study) + lubridate::years(1)]
+  coefkd_week <- coefkd_week[date >= date_study & date < date_study + lubridate::years(1)]
   coefkd_week[]
 }
 
