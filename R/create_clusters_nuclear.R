@@ -75,7 +75,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
         coef_clus <- get_clusters_coef(cluster, clusters_desc, kd_cho, start_date)
         
         datetime_prolongation <- unlist(datetime_prolongation)
-        capacity_modulation <- (!datetime_study %in% datetime_prolongation) * rep(coef_clus$abat_rso, each = 24)
+        capacity_modulation <- (!datetime_study %in% datetime_prolongation) * rep(head(coef_clus$abat_rso, 365), each = 24)
         matrix(
           data = c(
             rep(1, times = 8760 * 2),
