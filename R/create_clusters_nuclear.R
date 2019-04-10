@@ -117,7 +117,8 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
         duree_prolongation_mean <- dat$duree_prolongation_mean[as.character(dat$date_de_fin_sans_prolongation) %in% as.character(date_study + days(1))]
         res <- matrix(
           data = c(
-            rep(1, times = n_days * 2),
+            rep(7, times = n_days * 1),
+            rep(1, times = n_days * 1),
             rep(0, times = n_days * 3),
             rep(1, times = n_days * 1)
           ),
