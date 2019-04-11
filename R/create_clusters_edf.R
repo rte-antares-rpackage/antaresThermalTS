@@ -70,7 +70,7 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL, area_na
             if (dat$date_fin_arret[i] > dat$date_debut[i]) {
               res <- seq(
                 from = as_datetime(dat$date_debut[i]), 
-                to = dat$date_fin_arret[i] - hours(1), 
+                to = dat$date_fin_arret[i] + days(1) - hours(1), 
                 by = "1 hour"
               )
               as.character(res)

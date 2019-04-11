@@ -80,7 +80,7 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
             if (dat$dt_fin_arret[i] > dat$dt_debut_arret[i]) {
               res <- seq(
                 from = as_datetime(dat$dt_debut_arret[i]), 
-                to = dat$dt_fin_arret[i] - hours(1), 
+                to = dat$dt_fin_arret[i] + days(1) - hours(1), 
                 by = "1 hour"
               )
               as.character(res)
