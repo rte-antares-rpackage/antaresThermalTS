@@ -40,6 +40,8 @@ read_planning <- function(path, sheet = "Planning", start_col = "A", start_row =
   )
   setDT(data)
 
+  data[is.na(nom_site), code_gp := NA_character_]
+  
   # convert POSIXct columns to Date
   date_cols <- c("dt_debut_arret", "dt_fin_arret",
                  "dt_debut_corr", "dt_fin_corr",
