@@ -110,10 +110,9 @@ descr_clusters <- function(name) {
   if (!is.null(name) && name %in% names(descr)) {
     descr[[name]]
   } else {
-    warning("Cluster description not found!", call. = FALSE)
+    warning(paste0("No description found for: ", name), call. = FALSE)
     NULL
   }
-  
 }
 
 
@@ -177,7 +176,7 @@ corr_groupe_descr <- function(code_groupe) {
   if (!is.null(code_groupe) && code_groupe %in% code_groupe_) {
     clus_name_[which(code_groupe_ == code_groupe)]
   } else {
-    warning("code_groupe not found !", call. = FALSE)
+    warning(paste0("No correspondence found for: ", code_groupe), call. = FALSE)
     NULL
   }
 }

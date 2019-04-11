@@ -20,6 +20,7 @@
 #' @importFrom stringi stri_replace_all_regex
 #' @importFrom progress progress_bar
 #' @importFrom utils head
+#' @importFrom data.table data.table rbindlist :=
 create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date = NULL, area_name = NULL, opts = simOptions()) {
   
   if (is.null(start_date))
@@ -40,6 +41,33 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
   
   infos[, pmax := as.numeric(pmax)]
   infos[is.na(pmax), pmax := 0]
+  
+  
+  # correctif AMFART14
+  if ("AMFART14" %in% planning$code_gp) {
+    infos <- rbindlist(list(
+      infos,
+      data.table(
+        code_gp = "AMFART14",
+        pmax = planning[code_gp == "AMFART14", unique(pcn_mw)],
+        pmin = corresp_gps()[code_gp == "AMFART14", c(pmin)],
+        name_desc = corresp_gps()[code_gp == "AMFART14", c(name_desc)]
+      )
+    ), fill = TRUE)
+  }
+  # correctif AMFART15
+  if ("AMFART15" %in% planning$code_gp) {
+    infos <- rbindlist(list(
+      infos,
+      data.table(
+        code_gp = "AMFART15",
+        pmax = planning[code_gp == "AMFART15", unique(pcn_mw)],
+        pmin = corresp_gps()[code_gp == "AMFART15", c(pmin)],
+        name_desc = corresp_gps()[code_gp == "AMFART14", c(name_desc)]
+      )
+    ), fill = TRUE)
+  }
+
   
   unique_code_gp <- unique(intersect(planning$code_gp, infos$code_gp))
   code_gp_rm <- setdiff(union(planning$code_gp, infos$code_gp), unique_code_gp)
@@ -155,7 +183,7 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
       
       prepro_data = matrix(
         data = c(
-          rep(7, times = n_days ),
+          rep(7, times = n_days),
           rep(1, times = n_days),
           fo_rate,
           rep(0, times = n_days * 2),
