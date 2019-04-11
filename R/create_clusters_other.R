@@ -67,6 +67,18 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
       )
     ), fill = TRUE)
   }
+  # correctif PROVET 4B
+  if ("PROVET 4B" %in% planning$code_gp) {
+    infos <- rbindlist(list(
+      infos,
+      data.table(
+        code_gp = "PROVET 4B",
+        pmax = planning[code_gp == "PROVET 4B", unique(pcn_mw)],
+        pmin = corresp_gps()[code_gp == "PROVENCE 4B", c(pmin)],
+        name_desc = corresp_gps()[code_gp == "PROVENCE 4B", c(name_desc)]
+      )
+    ), fill = TRUE)
+  }
 
   
   unique_code_gp <- unique(intersect(planning$code_gp, infos$code_gp))
