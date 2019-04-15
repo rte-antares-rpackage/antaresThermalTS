@@ -74,8 +74,8 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL, start_date
       data.table(
         code_gp = "PROVET 4B",
         pmax = planning[code_gp == "PROVET 4B", unique(pcn_mw)],
-        pmin = corresp_gps()[code_gp == "PROVENCE 4B", c(pmin)],
-        name_desc = corresp_gps()[code_gp == "PROVENCE 4B", c(name_desc)]
+        pmin = corresp_gps()[code_gp == "PROVET 4B", c(pmin)],
+        name_desc = corresp_gps()[code_gp == "PROVET 4B", c(name_desc)]
       )
     ), fill = TRUE)
   }
