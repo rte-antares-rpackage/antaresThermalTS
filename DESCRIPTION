@@ -1,6 +1,6 @@
 Package: antaresThermalTS
 Title: Extended Shutdown Simulation with 'Antares' for Power Groups
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: c(
     person("Victor", "Perrier", email = "victor.perrier@dreamRs.fr", role = c("aut", "cre")),
     person("Fabiola", "Aravena-Rojas", email = "fabiola.aravena-rojas@rte-france.com", role = c("aut")),
