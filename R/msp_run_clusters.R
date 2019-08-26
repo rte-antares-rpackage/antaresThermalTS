@@ -60,11 +60,11 @@ msp_run_clusters <- function(start_date = NULL, first_weekday = 1, stop_all_week
   )
   if (isTRUE(stop_all_week)) {
     sd_clus[n == 7, list(
-      min.stable.power = sum(min.stable.power[shutdown_all == FALSE], na.rm = TRUE) / 1e4
+      min.stable.power = sum(min.stable.power[shutdown_all == FALSE], na.rm = TRUE) / 1e3
     ), by = list(week, date, group)]
   } else {
     sd_clus[n == 7, list(
-      min.stable.power = sum(min.stable.power[shutdown_any == FALSE], na.rm = TRUE) / 1e4
+      min.stable.power = sum(min.stable.power[shutdown_any == FALSE], na.rm = TRUE) / 1e3
     ), by = list(week, date, group)]
   }
 }

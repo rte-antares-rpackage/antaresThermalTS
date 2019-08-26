@@ -63,11 +63,11 @@ pcn_stop_clusters <- function(start_date = NULL, first_weekday = 1, stop_all_wee
   )
   if (isTRUE(stop_all_week)) {
     sd_clus[n == 7, list(
-      nominalcapacity = sum(nominalcapacity[shutdown_all == TRUE], na.rm = TRUE) / 1e4
+      nominalcapacity = sum(nominalcapacity[shutdown_all == TRUE], na.rm = TRUE) / 1e3
     ), by = list(week, date, group)]
   } else {
     sd_clus[n == 7, list(
-      nominalcapacity = sum(nominalcapacity[shutdown_any == TRUE], na.rm = TRUE) / 1e4
+      nominalcapacity = sum(nominalcapacity[shutdown_any == TRUE], na.rm = TRUE) / 1e3
     ), by = list(week, date, group)]
   }
 }
