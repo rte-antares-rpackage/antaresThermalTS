@@ -1,6 +1,6 @@
 Package: antaresThermalTS
 Title: Extended Shutdown Simulation with 'Antares' for Power Groups
-Version: 0.0.2.900
+Version: 0.0.2.910
 Authors@R: c(
     person("Victor", "Perrier", email = "victor.perrier@dreamRs.fr", role = c("aut", "cre")),
     person("Fabiola", "Aravena-Rojas", email = "fabiola.aravena-rojas@rte-france.com", role = c("aut")),
@@ -19,5 +19,6 @@ Imports:
     lubridate,
     stringi,
     zoo,
-    progress
+    progress,
+    anytime
 RoxygenNote: 6.1.1
