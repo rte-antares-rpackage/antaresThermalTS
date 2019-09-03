@@ -55,7 +55,7 @@ msp_run_clusters <- function(start_date = NULL, first_weekday = 1, stop_all_week
   sd_clus <- rbindlist(dates_sd)
   sd_clus <- merge(
     x = sd_clus, 
-    y = clusters[, list(area, cluster, min.stable.power, group)],
+    y = clusters[group == "nuclear", list(area, cluster, min.stable.power, group)],
     by = c("area", "cluster")
   )
   if (isTRUE(stop_all_week)) {
