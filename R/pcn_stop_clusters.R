@@ -1,11 +1,11 @@
 
 #' Get sum of PCN for stopped clusters by weeks
-#'
-#' @param start_date Starting date of the study.
+#' 
 #' @param first_weekday The first day to use for starting a week, default to \code{1} (monday).
-#' @param stop_all_week Consider that a cluster is stopped if it is really stopped the 7 days
-#'  of the weeks, otherwise the PCN of a clusters is counted for a week if it is stopped 
-#'  at least one day in the week.
+#' @param area Area(s) to include in the computation.
+#' @param remove_clusters Character vector. Cluster(s) to remove.
+#' @param start_date Starting date of the study. If \code{NULL} (the default),
+#'  the date of the antares study is used.
 #' @param opts
 #'   List of simulation parameters returned by the function
 #'   \code{setSimulationPath} 
@@ -14,7 +14,7 @@
 #' @export
 #' 
 #' @importFrom data.table fread rbindlist first
-#' @importFrom lubridate wday
+#' @importFrom lubridate wday hour
 #'
 #' @examples
 #' \dontrun{
@@ -27,23 +27,27 @@
 #' pcn_stop_clusters(first_weekday = 6) # saturday
 #' 
 #' }
-pcn_stop_clusters <- function(start_date = NULL, first_weekday = 1, stop_all_week = TRUE, opts = simOptions()) {
+pcn_stop_clusters <- function(first_weekday = 1, area = "fr", remove_clusters = NULL, start_date = NULL, opts = simOptions()) {
   if (is.null(start_date)) {
     start_date <- opts$start
   }
+  area_ <- area
   clusters <- readClusterDesc(opts = opts)
+  clusters <- clusters[area %in% area_]
+  clusters <- clusters[!cluster %in% remove_clusters]
   clusters[, group := as.character(group)]
   dates_sd <- mapply(
     FUN = function(area, cluster) {
       data_mod <- fread(file = file.path(opts$inputPath, "thermal", "prepro", area, cluster, "modulation.txt"))
       data_mod[, time := seq(from = start_date, by = "hour", length.out = .N)]
+      data_mod[, shutdown := 0]
+      data_mod[lubridate::wday(time, week_start = 1) == 7 & lubridate::hour(time) == 5 & V3 == 0, shutdown := 1]
       data_mod <- data_mod[, lapply(.SD, sum), by = list(date = as.Date(format(time)))]
       data_mod[, week := lubridate::wday(date, week_start = first_weekday)]
       data_mod[week > 1, week := 0]
       data_mod[, week := cumsum(week)]
       data_mod <- data_mod[, list(
-        shutdown_any = any(V3 == 0), 
-        shutdown_all = all(V3 == 0),
+        shutdown = any(shutdown == 1), 
         date = first(date),
         n = .N
       ), by = week]
@@ -61,14 +65,8 @@ pcn_stop_clusters <- function(start_date = NULL, first_weekday = 1, stop_all_wee
     y = clusters[, list(area, cluster, nominalcapacity, group)],
     by = c("area", "cluster")
   )
-  if (isTRUE(stop_all_week)) {
-    sd_clus[n == 7, list(
-      nominalcapacity = sum(nominalcapacity[shutdown_all == TRUE], na.rm = TRUE) / 1e3
-    ), by = list(week, date, group)]
-  } else {
-    sd_clus[n == 7, list(
-      nominalcapacity = sum(nominalcapacity[shutdown_any == TRUE], na.rm = TRUE) / 1e3
-    ), by = list(week, date, group)]
-  }
+  sd_clus[n == 7, list(
+    nominalcapacity = sum(nominalcapacity[shutdown == TRUE], na.rm = TRUE) / 1e3
+  ), by = list(week, date, group)]
 }
 

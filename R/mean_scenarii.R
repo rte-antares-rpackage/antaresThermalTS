@@ -10,7 +10,7 @@
 #' @export
 #' 
 #' @importFrom antaresRead readInputTS
-#' @importFrom lubridate wday
+#' @importFrom lubridate wday hour
 #' @importFrom data.table first := 
 #' @importFrom anytime anydate
 #'
@@ -23,15 +23,18 @@
 #' }
 mean_scenarii <- function(first_weekday = 1, opts = simOptions()) {
   ts <- readInputTS(thermalAvailabilities = "fr", opts = opts)
+  ts[, WED19 := FALSE]
+  ts[lubridate::wday(time, week_start = 1) == 3 & lubridate::hour(time) == 19, WED19 := TRUE]
   ts[, date := anytime::anydate(time)]
+  # ts[, date := as.Date(format(time))]
   ts <- ts[, list(
-    ThermalAvailabilities = mean(ThermalAvailabilities)
+    ThermalAvailabilities = mean(ThermalAvailabilities[WED19 == TRUE])
   ), by = list(area, cluster, date)]
   ts[, week := lubridate::wday(date, week_start = first_weekday)]
   ts[week > 1, week := 0]
   ts[, week := cumsum(week), by = list(area, cluster)]
   tsweek <- ts[, list(
-    ThermalAvailabilities = mean(ThermalAvailabilities),
+    ThermalAvailabilities = mean(ThermalAvailabilities, na.rm = TRUE),
     date = first(date),
     n = .N
   ), by = list(area, cluster, week)]

@@ -4,17 +4,18 @@
 \alias{pcn_stop_clusters}
 \title{Get sum of PCN for stopped clusters by weeks}
 \usage{
-pcn_stop_clusters(start_date = NULL, first_weekday = 1,
-  stop_all_week = TRUE, opts = simOptions())
+pcn_stop_clusters(first_weekday = 1, area = "fr",
+  remove_clusters = NULL, start_date = NULL, opts = simOptions())
 }
 \arguments{
-\item{start_date}{Starting date of the study.}
-
 \item{first_weekday}{The first day to use for starting a week, default to \code{1} (monday).}
 
-\item{stop_all_week}{Consider that a cluster is stopped if it is really stopped the 7 days
-of the weeks, otherwise the PCN of a clusters is counted for a week if it is stopped 
-at least one day in the week.}
+\item{area}{Area(s) to include in the computation.}
+
+\item{remove_clusters}{Character vector. Cluster(s) to remove.}
+
+\item{start_date}{Starting date of the study. If \code{NULL} (the default),
+the date of the antares study is used.}
 
 \item{opts}{List of simulation parameters returned by the function
 \code{setSimulationPath}}
