@@ -1,5 +1,5 @@
 
-#' Mean of scenarii by weeks
+#' Mean of thermal timeseries by weeks
 #'
 #' @param first_weekday The first day to use for starting a week, default to \code{1} (monday).
 #' @param opts
@@ -20,8 +20,10 @@
 #' library(antaresRead)
 #' setSimulationPath(path = "PATH/TO/STUDY")
 #' 
+#' mean_thermal_ts()
+#' 
 #' }
-mean_scenarii <- function(first_weekday = 1, opts = simOptions()) {
+mean_thermal_ts <- function(first_weekday = 1, opts = simOptions()) {
   ts <- readInputTS(thermalAvailabilities = "fr", opts = opts)
   ts[, WED19 := FALSE]
   ts[lubridate::wday(time, week_start = 1) == 3 & lubridate::hour(time) == 19, WED19 := TRUE]
