@@ -42,7 +42,7 @@ pcn_stop_clusters <- function(first_weekday = 1, area = "fr", remove_clusters = 
       data_mod[, time := seq(from = start_date, by = "hour", length.out = .N)]
       data_mod[, shutdown := 0]
       data_mod[lubridate::wday(time, week_start = 1) == 7 & lubridate::hour(time) == 5 & V3 == 0, shutdown := 1]
-      data_mod <- data_mod[, lapply(.SD, sum), by = list(date = as.Date(format(time)))]
+      data_mod <- data_mod[, list(shutdown = any(shutdown == 1) * 1), by = list(date = as.Date(format(time)))]
       data_mod[, week := lubridate::wday(date, week_start = first_weekday)]
       data_mod[week > 1, week := 0]
       data_mod[, week := cumsum(week)]
@@ -66,7 +66,8 @@ pcn_stop_clusters <- function(first_weekday = 1, area = "fr", remove_clusters = 
     by = c("area", "cluster")
   )
   sd_clus[n == 7, list(
-    nominalcapacity = sum(nominalcapacity[shutdown == TRUE], na.rm = TRUE) / 1e3
+    nominalcapacity = sum(nominalcapacity[shutdown == TRUE], na.rm = TRUE) / 1e3,
+    nominalcapacity.total = sum(nominalcapacity, na.rm = TRUE) / 1e3
   ), by = list(week, date, group)]
 }
 
