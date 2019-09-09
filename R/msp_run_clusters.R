@@ -46,9 +46,12 @@ msp_run_clusters <- function(first_weekday = 1, area = "fr", remove_clusters = N
       data_mod[, week := lubridate::wday(date, week_start = first_weekday)]
       data_mod[week > 1, week := 0]
       data_mod[, week := cumsum(week)]
+      data_mod[lubridate::wday(date, week_start = 1) == 1, nweek := lubridate::isoweek(date)]
+      data_mod[, nweek := nweek[!is.na(nweek)][1], by = week]
       data_mod <- data_mod[, list(
         shutdown = any(shutdown == 1), 
         date = first(date),
+        nweek = first(nweek),
         n = .N
       ), by = week]
       data_mod[, area := area]
@@ -68,6 +71,6 @@ msp_run_clusters <- function(first_weekday = 1, area = "fr", remove_clusters = N
   sd_clus[n == 7, list(
     min.stable.power = sum(min.stable.power[shutdown == FALSE], na.rm = TRUE) / 1e3,
     min.stable.power.total = sum(min.stable.power, na.rm = TRUE) / 1e3
-  ), by = list(week, date, group)]
+  ), by = list(week, nweek, date, group)]
 }
 
