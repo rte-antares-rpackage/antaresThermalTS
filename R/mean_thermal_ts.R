@@ -10,7 +10,7 @@
 #' @export
 #' 
 #' @importFrom antaresRead readInputTS
-#' @importFrom lubridate wday hour
+#' @importFrom lubridate wday hour isoweek
 #' @importFrom data.table first := 
 #' @importFrom anytime anydate
 #'
@@ -35,9 +35,12 @@ mean_thermal_ts <- function(first_weekday = 1, opts = simOptions()) {
   ts[, week := lubridate::wday(date, week_start = first_weekday)]
   ts[week > 1, week := 0]
   ts[, week := cumsum(week), by = list(area, cluster)]
+  ts[lubridate::wday(date, week_start = 1) == 1, nweek := lubridate::isoweek(date)]
+  ts[, nweek := nweek[!is.na(nweek)][1], by = week]
   tsweek <- ts[, list(
     ThermalAvailabilities = mean(ThermalAvailabilities, na.rm = TRUE),
     date = first(date),
+    nweek = first(nweek),
     n = .N
   ), by = list(area, cluster, week)]
   tsweek[n == 7][, n := NULL][]
