@@ -9,7 +9,7 @@
 #' @return a \code{data.table}.
 #' @export
 #' 
-#' @importFrom antaresRead readInputTS
+#' @importFrom antaresRead readInputTS readClusterDesc
 #' @importFrom lubridate wday hour isoweek
 #' @importFrom data.table first := 
 #' @importFrom anytime anydate
@@ -24,6 +24,7 @@
 #' 
 #' }
 mean_thermal_ts <- function(first_weekday = 1, opts = simOptions()) {
+  clusters <- readClusterDesc(opts = opts)
   ts <- readInputTS(thermalAvailabilities = "fr", opts = opts)
   ts[, WED19 := FALSE]
   ts[lubridate::wday(time, week_start = 1) == 3 & lubridate::hour(time) == 19, WED19 := TRUE]
@@ -43,7 +44,14 @@ mean_thermal_ts <- function(first_weekday = 1, opts = simOptions()) {
     nweek = first(nweek),
     n = .N
   ), by = list(area, cluster, week)]
-  tsweek[n == 7][, n := NULL][]
+  tsweek <- tsweek[n == 7]
+  tsweek[, n := NULL]
+  tsweek <- merge(
+    x = tsweek,
+    y = clusters[, list(area, cluster, group)],
+    by = c("area", "cluster")
+  )
+  tsweek[]
 }
 
 
