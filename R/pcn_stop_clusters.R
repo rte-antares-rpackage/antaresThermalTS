@@ -41,7 +41,7 @@ pcn_stop_clusters <- function(first_weekday = 1, area = "fr", remove_clusters = 
       data_mod <- fread(file = file.path(opts$inputPath, "thermal", "prepro", area, cluster, "modulation.txt"))
       data_mod[, time := seq(from = start_date, by = "hour", length.out = .N)]
       data_mod[, shutdown := 0]
-      data_mod[lubridate::wday(time, week_start = 1) == 7 & lubridate::hour(time) == 5 & V3 == 0, shutdown := 1]
+      data_mod[lubridate::wday(time, week_start = 1) == 3 & lubridate::hour(time) == 19 & V3 == 0, shutdown := 1]
       data_mod <- data_mod[, list(shutdown = any(shutdown == 1) * 1), by = list(date = as.Date(format(time)))]
       data_mod[, week := lubridate::wday(date, week_start = first_weekday)]
       data_mod[week > 1, week := 0]
