@@ -58,6 +58,7 @@ mean_thermal_ts <- function(first_weekday = 1, opts = simOptions()) {
 #' Mean of thermal timeseries by weeks
 #'
 #' @param first_weekday The first day to use for starting a week, default to \code{1} (monday).
+#' @param remove_clusters Character vector. Cluster(s) to remove.
 #' @param opts
 #'   List of simulation parameters returned by the function
 #'   \code{setSimulationPath} 
@@ -71,12 +72,13 @@ mean_thermal_ts <- function(first_weekday = 1, opts = simOptions()) {
 #' @importFrom anytime anydate
 #' @importFrom progress progress_bar
 #'
-mean_thermal_ts2 <- function(first_weekday = 1, opts = simOptions()) {
+mean_thermal_ts2 <- function(first_weekday = 1, remove_clusters = NULL, opts = simOptions()) {
   clusters <- readClusterDesc(opts = opts)
   clusters[, area := as.character(area)]
   clusters[, cluster := as.character(cluster)]
   clusters[, group := as.character(group)]
   clusters <- clusters[area == "fr"]
+  clusters <- clusters[!cluster %in% remove_clusters]
   pb <- progress_bar$new(
     format = "  Reading clusters time-series [:bar] :percent",
     total = nrow(clusters), clear = FALSE
