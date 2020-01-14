@@ -4,8 +4,13 @@
 \alias{pcn_stop_clusters}
 \title{Get sum of PCN for stopped clusters by weeks}
 \usage{
-pcn_stop_clusters(first_weekday = 1, area = "fr",
-  remove_clusters = NULL, start_date = NULL, opts = simOptions())
+pcn_stop_clusters(
+  first_weekday = 1,
+  area = "fr",
+  remove_clusters = NULL,
+  start_date = NULL,
+  opts = simOptions()
+)
 }
 \arguments{
 \item{first_weekday}{The first day to use for starting a week, default to \code{1} (monday).}

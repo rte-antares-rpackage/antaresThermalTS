@@ -114,7 +114,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
       } else {
         date_study <- seq(from = as.Date(start_date), length.out = n_days, by = "1 day")
         date_reprise <- which(as.character(date_study) %in% as.character(dat$date_de_fin_sans_prolongation))
-        duree_prolongation_mean <- dat$duree_prolongation_mean[as.character(dat$date_de_fin_sans_prolongation) %in% as.character(date_study + days(1))]
+        duree_prolongation_mean <- dat$duree_prolongation_mean[as.character(dat$date_de_fin_sans_prolongation) %in% as.character(date_study)]
         res <- matrix(
           data = c(
             rep(7, times = n_days * 1),
@@ -146,7 +146,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
         fo_rate <- (!date_study %in% date_arret_prolongation) * (1 - coef_clus$kidispo_hqe)
         
         res[, 3] <- head(fo_rate, n = n_days)
-        
+        # browser()
         res[date_reprise, 2] <- duree_prolongation_mean
         res[date_reprise, 4] <- 1
         return(res)

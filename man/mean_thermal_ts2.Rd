@@ -4,8 +4,11 @@
 \alias{mean_thermal_ts2}
 \title{Mean of thermal timeseries by weeks}
 \usage{
-mean_thermal_ts2(first_weekday = 1, remove_clusters = NULL,
-  opts = simOptions())
+mean_thermal_ts2(
+  first_weekday = 1,
+  remove_clusters = NULL,
+  opts = simOptions()
+)
 }
 \arguments{
 \item{first_weekday}{The first day to use for starting a week, default to \code{1} (monday).}

@@ -4,9 +4,16 @@
 \alias{create_clusters_nuclear}
 \title{Create nuclear clusters}
 \usage{
-create_clusters_nuclear(calendar, clusters_desc, kd_cho,
-  start_date = NULL, area_name = NULL, law_planned = "geometric",
-  volatility_planned = 1, opts = simOptions())
+create_clusters_nuclear(
+  calendar,
+  clusters_desc,
+  kd_cho,
+  start_date = NULL,
+  area_name = NULL,
+  law_planned = "geometric",
+  volatility_planned = 1,
+  opts = simOptions()
+)
 }
 \arguments{
 \item{calendar}{Calendar data read with \code{\link{read_calendar}}.}
