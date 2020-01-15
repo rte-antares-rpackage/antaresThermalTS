@@ -9,6 +9,8 @@
 #' @param area_name Name of the area where to create clusters.
 #' @param law_planned Law to use in Antares.
 #' @param volatility_planned Volatility for the law.
+#' @param constraints Stretch/Zircaloy constraints read with
+#'   \code{\link{read_constraints}}. Defaults to NULL.
 #' @param opts
 #'   List of simulation parameters returned by the function
 #'   \code{setSimulationPath} 
@@ -22,7 +24,8 @@
 #' @importFrom stringi stri_replace_all_regex
 #' @importFrom progress progress_bar
 create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date = NULL, area_name = NULL, 
-                                    law_planned = "geometric", volatility_planned = 1, opts = simOptions()) {
+                                    law_planned = "geometric", volatility_planned = 1, constraints = NULL,
+                                    opts = simOptions()) {
   
   if (is.null(start_date))
     start_date <- format(opts$start, format = "%Y-%m-%d")
@@ -37,6 +40,9 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
     format = "  Preparing modulation data [:bar] :percent",
     total = length(unique_tranches), clear = FALSE
   )
+  
+  datetime_study <- seq(from = as.POSIXct(start_date, tz = "UTC"), length.out = 8760, by = "1 hour")
+  datetime_study_chr <- as.character(datetime_study)
   
   # Modulation data
   modulation_list <- lapply(
@@ -56,8 +62,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
           ncol = 4
         )
       } else {
-        datetime_study <- seq(from = as.POSIXct(start_date, tz = "UTC"), length.out = 8760, by = "1 hour")
-        datetime_study <- as.character(datetime_study)
+
         datetime_prolongation <- lapply(
           X = seq_len(nrow(dat)), 
           FUN = function(i) {
@@ -75,12 +80,21 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
         coef_clus <- get_clusters_coef(cluster, clusters_desc, kd_cho, start_date)
         
         datetime_prolongation <- unlist(datetime_prolongation)
-        capacity_modulation <- (!datetime_study %in% datetime_prolongation) * rep(head(coef_clus$abat_rso, 365), each = 24)
+        capacity_modulation <- (!datetime_study_chr %in% datetime_prolongation) * rep(head(coef_clus$abat_rso, 365), each = 24)
+        
+        if (!is.null(constraints) && cluster %in% constraints$groupe) {
+          date_debut <- constraints[groupe == cluster, date_debut]
+          date_fin <- constraints[groupe == cluster, date_fin]
+          min_gen_modulation <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
+        } else {
+          min_gen_modulation <- rep(0, times = 8760 * 1)
+        }
+        
         matrix(
           data = c(
             rep(1, times = 8760 * 2),
             capacity_modulation,
-            rep(0, times = 8760 * 1)
+            min_gen_modulation
           ),
           ncol = 4
         )

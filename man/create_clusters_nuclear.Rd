@@ -12,6 +12,7 @@ create_clusters_nuclear(
   area_name = NULL,
   law_planned = "geometric",
   volatility_planned = 1,
+  constraints = NULL,
   opts = simOptions()
 )
 }
@@ -30,6 +31,9 @@ the date will be retrieve from the Antares study.}
 \item{law_planned}{Law to use in Antares.}
 
 \item{volatility_planned}{Volatility for the law.}
+
+\item{constraints}{Stretch/Zircaloy constraints read with
+\code{\link{read_constraints}}. Defaults to NULL.}
 
 \item{opts}{List of simulation parameters returned by the function
 \code{setSimulationPath}}

@@ -10,6 +10,7 @@ create_clusters_other(
   hypothesis = NULL,
   start_date = NULL,
   area_name = NULL,
+  constraints = NULL,
   opts = simOptions()
 )
 }
@@ -24,6 +25,9 @@ create_clusters_other(
 the date will be retrieve from the Antares study.}
 
 \item{area_name}{Name of the area where to create clusters.}
+
+\item{constraints}{Stretch/Zircaloy constraints read with
+\code{\link{read_constraints}}. Defaults to NULL.}
 
 \item{opts}{List of simulation parameters returned by the function
 \code{setSimulationPath}}
