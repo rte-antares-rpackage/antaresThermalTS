@@ -82,7 +82,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
         datetime_prolongation <- unlist(datetime_prolongation)
         capacity_modulation <- (!datetime_study_chr %in% datetime_prolongation) * rep(head(coef_clus$abat_rso, 365), each = 24)
         
-        if (!is.null(constraints)) {
+        if (!is.null(constraints) && cluster %in% constraints$groupe) {
           date_debut <- constraints[groupe == cluster, date_debut]
           date_fin <- constraints[groupe == cluster, date_fin]
           v <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
