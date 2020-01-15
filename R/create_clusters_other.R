@@ -140,16 +140,16 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
         if (!is.null(constraints) && cluster %in% constraints$groupe) {
           date_debut <- constraints[groupe == cluster, date_debut]
           date_fin <- constraints[groupe == cluster, date_fin]
-          v <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
+          min_gen_modulation <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
         } else {
-          v <- rep(0, times = 8760 * 1)
+          min_gen_modulation <- rep(0, times = 8760 * 1)
         }
         
         matrix(
           data = c(
             rep(1, times = 8760 * 2),
             capacity_modulation,
-            v
+            min_gen_modulation
           ),
           ncol = 4
         )
