@@ -176,12 +176,14 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL, area_na
 #' @importFrom stringi stri_extract
 get_fo_rate_edf <- function(edf, code_groupe, date_study) {
   
-  kp <- c("kp_2019_hors_ete", 
-          "kp_2019_ete", 
-          "kp_2020_hors_ete",
-          "kp_2020_ete", 
-          "kp_2021_hors_ete", 
-          "kp_2021_ete")
+  date_debut_etude <- year(date_study)
+  
+  kp <- c(paste0("kp_", date_debut_etude,"_hors_ete"), 
+          paste0("kp_", date_debut_etude, "_ete"), 
+          paste0("kp_",date_debut_etude + 1,"_hors_ete"),
+          paste0("kp_", date_debut_etude + 1,"_ete"), 
+          paste0("kp_", date_debut_etude + 2,"_hors_ete"), 
+          paste0("kp_",date_debut_etude + 2,"_ete"))
   
   coresp_kp_week <- lapply(
     X = kp,
@@ -205,12 +207,12 @@ get_fo_rate_edf <- function(edf, code_groupe, date_study) {
   
   edf_gp <- unique(edf[code_gp == code_groupe], by = "code_gp")
   
-  kp <- c("kp_2019_hors_ete", 
-          "kp_2019_ete", 
-          "kp_2020_hors_ete",
-          "kp_2020_ete", 
-          "kp_2021_hors_ete", 
-          "kp_2021_ete")
+  kp <- c(paste0("kp_", date_debut_etude,"_hors_ete"), 
+          paste0("kp_", date_debut_etude, "_ete"), 
+          paste0("kp_",date_debut_etude + 1,"_hors_ete"),
+          paste0("kp_", date_debut_etude + 1,"_ete"), 
+          paste0("kp_", date_debut_etude + 2,"_hors_ete"), 
+          paste0("kp_",date_debut_etude + 2,"_ete"))
   edf_gp <- melt(
     data = edf_gp, 
     id.vars = "code_gp",
@@ -220,7 +222,7 @@ get_fo_rate_edf <- function(edf, code_groupe, date_study) {
     value.name = "kp_value"
   )
   edf_gp <- merge(x = coresp_kp_week, y = edf_gp)
-  edf_gp <- merge(x = edf_gp, y = build_weekcal(), by = "week")
+  edf_gp <- merge(x = edf_gp, y = build_weekcal(start = date_debut_etude, end = date_debut_etude + 2), by = "week")
   
   edf_gp <- edf_gp[rep(seq_len(.N), each = 7)]
   edf_gp[, num_seq := seq_len(.N) - 1, by = week]
