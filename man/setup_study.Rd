@@ -4,9 +4,14 @@
 \alias{setup_study}
 \title{Create an (empty) Antares study for Extended Shutdown Simulation}
 \usage{
-setup_study(path, start_date = "2018-07-01",
-  study_name = "prolongation-arrets", area_name = "fr",
-  keep_clusters = "fr_dsr_long", nb_ts_thermal = 1000)
+setup_study(
+  path,
+  start_date = "2018-07-01",
+  study_name = "prolongation-arrets",
+  area_name = "fr",
+  keep_clusters = "fr_dsr_long",
+  nb_ts_thermal = 1000
+)
 }
 \arguments{
 \item{path}{Path to an Antares study or to a directory for creating one.}

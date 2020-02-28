@@ -4,8 +4,7 @@
 \alias{read_planning}
 \title{Read a maintenance planning}
 \usage{
-read_planning(path, sheet = "Planning", start_col = "A",
-  start_row = 16)
+read_planning(path, sheet = "Planning", start_col = "A", start_row = 16)
 }
 \arguments{
 \item{path}{Character. Path to the Excel file}

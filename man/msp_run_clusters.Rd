@@ -4,8 +4,13 @@
 \alias{msp_run_clusters}
 \title{Get sum of Min Stable Power for running clusters by weeks}
 \usage{
-msp_run_clusters(first_weekday = 1, area = "fr",
-  remove_clusters = NULL, start_date = NULL, opts = simOptions())
+msp_run_clusters(
+  first_weekday = 1,
+  area = "fr",
+  remove_clusters = NULL,
+  start_date = NULL,
+  opts = simOptions()
+)
 }
 \arguments{
 \item{first_weekday}{The first day to use for starting a week, default to \code{1} (monday).}
