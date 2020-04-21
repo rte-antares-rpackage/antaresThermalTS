@@ -39,9 +39,11 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL,
   hypothesis <- hypothesis[!is.na(code_gp)]
   
   # remove AGP shutdown
+  list_agp_stations <- planning[type_darret == "AGP"]$code_gp
   planning <- planning[type_darret != "AGP"]
   
-  unique_code_gp <- unique(planning$code_gp)
+  unique_code_gp_with_agp <- unique(hypothesis$code_gp)
+  unique_code_gp <- unique_code_gp_with_agp[!unique_code_gp_with_agp %in% list_agp_stations]
 
   pb <- progress_bar$new(
     format = "  Preparing modulation data [:bar] :percent",
@@ -61,13 +63,7 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL,
       pb$tick()
       dat <- planning[code_gp == cluster & !is.na(date_debut)]
       if (nrow(dat) == 0) {
-        matrix(
-          data = c(
-            rep(1, times = 8760 * 3),
-            rep(0, times = 8760 * 1)
-          ),
-          ncol = 4
-        )
+        capacity_modulation <- rep(1, times = 8760 * 1)
       } else {
         datetime_prolongation <- lapply(
           X = seq_len(nrow(dat)), 
@@ -86,23 +82,25 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL,
         datetime_prolongation <- unlist(datetime_prolongation)
         capacity_modulation <- (!datetime_study_chr %in% datetime_prolongation) * 1
         
-        if (!is.null(constraints) && cluster %in% constraints$groupe) {
-          date_debut <- constraints[groupe == cluster, date_debut]
-          date_fin <- constraints[groupe == cluster, date_fin]
-          min_gen_modulation <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
-        } else {
-          min_gen_modulation <- rep(0, times = 8760 * 1)
-        }
-        
-        matrix(
-          data = c(
-            rep(1, times = 8760 * 2),
-            capacity_modulation,
-            min_gen_modulation
-          ),
-          ncol = 4
-        )
       }
+      
+      if (!is.null(constraints) && cluster %in% constraints$groupe) {
+        date_debut <- constraints[groupe == cluster, date_debut]
+        date_fin <- constraints[groupe == cluster, date_fin]
+        min_gen_modulation <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
+      } else {
+        min_gen_modulation <- rep(0, times = 8760 * 1)
+      }
+      
+      matrix(
+        data = c(
+          rep(1, times = 8760 * 2),
+          capacity_modulation,
+          min_gen_modulation
+        ),
+        ncol = 4
+      )
+      
     }
   )
 
@@ -145,8 +143,11 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL,
     
     pb$tick()
     
-    infos_clus <- planning[code_gp == cluster]
+    infos_clus <- hypothesis[code_gp == cluster]
     infos_clus <- unique(infos_clus, by = "code_gp")
+    
+    infos_clus$pcn_mw <- as.numeric(infos_clus$pcn_mw)
+    infos_clus$pmin_mw <- as.numeric(infos_clus$pmin_mw)
     
     cluster_infos <- descr_clusters(infos_clus$name_desc)
     

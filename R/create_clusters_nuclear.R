@@ -32,7 +32,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
   
   area_name <- get_area_name(area_name)
   
-  unique_tranches <- unique(calendar$tranche)
+  unique_tranches <- unique(clusters_desc[grepl("Nucléaire", type_groupe),]$corresp_groupes)
   
   n_days <- if (is_leapyear(opts)) 366 else 365
   
@@ -54,13 +54,8 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
       pb$tick()
       dat <- calendar[tranche == cluster]
       if (nrow(dat) == 0) {
-        matrix(
-          data = c(
-            rep(1, times = 8760 * 3),
-            rep(0, times = 8760 * 1)
-          ),
-          ncol = 4
-        )
+        coef_clus <- get_clusters_coef(cluster, clusters_desc, kd_cho, start_date)
+        capacity_modulation <- rep(head(coef_clus$abat_rso, 365), each = 24)
       } else {
 
         datetime_prolongation <- lapply(
@@ -82,23 +77,25 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
         datetime_prolongation <- unlist(datetime_prolongation)
         capacity_modulation <- (!datetime_study_chr %in% datetime_prolongation) * rep(head(coef_clus$abat_rso, 365), each = 24)
         
-        if (!is.null(constraints) && cluster %in% constraints$groupe) {
-          date_debut <- constraints[groupe == cluster, date_debut]
-          date_fin <- constraints[groupe == cluster, date_fin]
-          min_gen_modulation <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
-        } else {
-          min_gen_modulation <- rep(0, times = 8760 * 1)
-        }
-        
-        matrix(
-          data = c(
-            rep(1, times = 8760 * 2),
-            capacity_modulation,
-            min_gen_modulation
-          ),
-          ncol = 4
-        )
       }
+      
+      if (!is.null(constraints) && cluster %in% constraints$groupe) {
+        date_debut <- constraints[groupe == cluster, date_debut]
+        date_fin <- constraints[groupe == cluster, date_fin]
+        min_gen_modulation <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
+      } else {
+        min_gen_modulation <- rep(0, times = 8760 * 1)
+      }
+      
+      matrix(
+        data = c(
+          rep(1, times = 8760 * 2),
+          capacity_modulation,
+          min_gen_modulation
+        ),
+        ncol = 4
+      )
+      
     }
   )
   
@@ -117,14 +114,20 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
       pb$tick()
       dat <- calendar[tranche == cluster]
       if (nrow(dat) == 0) {
-        matrix(
+        
+        coef_clus <- get_clusters_coef(cluster, clusters_desc, kd_cho, start_date)
+        
+        res <- matrix(
           data = c(
-            rep(1, times = n_days * 2),
-            rep(0, times = n_days * 3),
+            rep(7, times = n_days * 1),
+            rep(1, times = n_days * 1),
+            head((1 - coef_clus$kidispo_hqe), n = n_days),
+            rep(0, times = n_days * 2),
             rep(1, times = n_days * 1)
           ),
           ncol = 6
         )
+        
       } else {
         date_study <- seq(from = as.Date(start_date), length.out = n_days, by = "1 day")
         date_reprise <- which(as.character(date_study) %in% as.character(dat$date_de_fin_sans_prolongation))
@@ -163,8 +166,10 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
         # browser()
         res[date_reprise, 2] <- duree_prolongation_mean
         res[date_reprise, 4] <- 1
-        return(res)
+        
       }
+      
+      return(res)
     }
   )
   

@@ -41,15 +41,18 @@ msp_run_clusters <- function(first_weekday = 1, area = "fr", remove_clusters = N
       data_mod <- fread(file = file.path(opts$inputPath, "thermal", "prepro", area, cluster, "modulation.txt"))
       data_mod[, time := seq(from = start_date, by = "hour", length.out = .N)]
       data_mod[, shutdown := 0]
+      data_mod[, must_run := 0]
       data_mod[lubridate::wday(time, week_start = 1) == 7 & lubridate::hour(time) == 5 & V3 == 0, shutdown := 1]
-      data_mod <- data_mod[, list(shutdown = any(shutdown == 1) * 1), by = list(date = as.Date(format(time)))]
+      data_mod[lubridate::wday(time, week_start = 1) == 7 & lubridate::hour(time) == 5 & V4 == 1, must_run := 1]
+      data_mod <- data_mod[, list(shutdown = any(shutdown == 1) * 1, must_run = any(must_run == 1) * 1), by = list(date = as.Date(format(time)))]
       data_mod[, week := lubridate::wday(date, week_start = first_weekday)]
       data_mod[week > 1, week := 0]
       data_mod[, week := cumsum(week)]
       data_mod[lubridate::wday(date, week_start = 1) == 1, nweek := lubridate::isoweek(date)]
       data_mod[, nweek := nweek[!is.na(nweek)][1], by = week]
       data_mod <- data_mod[, list(
-        shutdown = any(shutdown == 1), 
+        shutdown = any(shutdown == 1),
+        must_run = any(must_run == 1),
         date = first(date),
         nweek = first(nweek),
         n = .N
@@ -65,9 +68,10 @@ msp_run_clusters <- function(first_weekday = 1, area = "fr", remove_clusters = N
   sd_clus <- rbindlist(dates_sd)
   sd_clus <- merge(
     x = sd_clus, 
-    y = clusters[group == "nuclear", list(area, cluster, min.stable.power, group)],
+    y = clusters[group == "nuclear", list(area, cluster, nominalcapacity, min.stable.power, group)],
     by = c("area", "cluster")
   )
+  sd_clus[must_run == TRUE, min.stable.power := nominalcapacity]
   sd_clus[n == 7, list(
     min.stable.power = sum(min.stable.power[shutdown == FALSE], na.rm = TRUE) / 1e3,
     min.stable.power.total = sum(min.stable.power, na.rm = TRUE) / 1e3

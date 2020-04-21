@@ -86,11 +86,11 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
   }
 
   
-  unique_code_gp <- unique(intersect(planning$code_gp, infos$code_gp))
+  unique_code_gp <- unique(infos$code_gp)
   code_gp_rm <- setdiff(union(planning$code_gp, infos$code_gp), unique_code_gp)
   if (length(code_gp_rm) > 0) {
     warning(paste(
-      "These clusters have been removed:", paste(code_gp_rm, collapse = ", "), "(not on both planning & info files)"
+      "These clusters have been removed:", paste(code_gp_rm, collapse = ", "), "(not on info file)"
     ), call. = FALSE)
   }
   
@@ -112,13 +112,7 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
       pb$tick()
       dat <- planning[code_gp == cluster & !is.na(dt_debut_arret)]
       if (nrow(dat) == 0) {
-        matrix(
-          data = c(
-            rep(1, times = 8760 * 3),
-            rep(0, times = 8760 * 1)
-          ),
-          ncol = 4
-        )
+        capacity_modulation <- rep(1, times = 8760 * 1)
       } else {
         datetime_prolongation <- lapply(
           X = seq_len(nrow(dat)), 
@@ -137,23 +131,25 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
         datetime_prolongation <- unlist(datetime_prolongation)
         capacity_modulation <- (!datetime_study_chr %in% datetime_prolongation) * 1
         
-        if (!is.null(constraints) && cluster %in% constraints$groupe) {
-          date_debut <- constraints[groupe == cluster, date_debut]
-          date_fin <- constraints[groupe == cluster, date_fin]
-          min_gen_modulation <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
-        } else {
-          min_gen_modulation <- rep(0, times = 8760 * 1)
-        }
-        
-        matrix(
-          data = c(
-            rep(1, times = 8760 * 2),
-            capacity_modulation,
-            min_gen_modulation
-          ),
-          ncol = 4
-        )
       }
+      
+      if (!is.null(constraints) && cluster %in% constraints$groupe) {
+        date_debut <- constraints[groupe == cluster, date_debut]
+        date_fin <- constraints[groupe == cluster, date_fin]
+        min_gen_modulation <- ifelse(datetime_study >= date_debut & datetime_study < date_fin, 1, 0)
+      } else {
+        min_gen_modulation <- rep(0, times = 8760 * 1)
+      }
+      
+      matrix(
+        data = c(
+          rep(1, times = 8760 * 2),
+          capacity_modulation,
+          min_gen_modulation
+        ),
+        ncol = 4
+      )
+      
     }
   )
   
