@@ -32,6 +32,10 @@ read_info <- function(path) {
     data.table(
       edp_ed_prev = c("Morandes"),
       code_gp =     c("MORANT 1")
+    ),
+    data.table(
+      edp_ed_prev = c("AMFARD 14", "AMFARD 15", "PROVENCE 4B"),
+      code_gp =     c("AMFART14", "AMFART15", "PROVET 4B")
     )
   ))
   clus_infos <- merge(x = clus_infos, y = corresp, all.x = TRUE, all.y = FALSE)

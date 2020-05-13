@@ -48,44 +48,6 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
   infos[is.na(pmax), pmax := 0]
   
   
-  # correctif AMFART14
-  if ("AMFART14" %in% planning$code_gp) {
-    infos <- rbindlist(list(
-      infos,
-      data.table(
-        code_gp = "AMFART14",
-        pmax = planning[code_gp == "AMFART14", unique(pcn_mw)],
-        pmin = corresp_gps()[code_gp == "AMFART14", c(pmin)],
-        name_desc = corresp_gps()[code_gp == "AMFART14", c(name_desc)]
-      )
-    ), fill = TRUE)
-  }
-  # correctif AMFART15
-  if ("AMFART15" %in% planning$code_gp) {
-    infos <- rbindlist(list(
-      infos,
-      data.table(
-        code_gp = "AMFART15",
-        pmax = planning[code_gp == "AMFART15", unique(pcn_mw)],
-        pmin = corresp_gps()[code_gp == "AMFART15", c(pmin)],
-        name_desc = corresp_gps()[code_gp == "AMFART14", c(name_desc)]
-      )
-    ), fill = TRUE)
-  }
-  # correctif PROVET 4B
-  if ("PROVET 4B" %in% planning$code_gp) {
-    infos <- rbindlist(list(
-      infos,
-      data.table(
-        code_gp = "PROVET 4B",
-        pmax = planning[code_gp == "PROVET 4B", unique(pcn_mw)],
-        pmin = corresp_gps()[code_gp == "PROVET 4B", c(pmin)],
-        name_desc = corresp_gps()[code_gp == "PROVET 4B", c(name_desc)]
-      )
-    ), fill = TRUE)
-  }
-
-  
   unique_code_gp <- unique(infos$code_gp)
   code_gp_rm <- setdiff(union(planning$code_gp, infos$code_gp), unique_code_gp)
   if (length(code_gp_rm) > 0) {
