@@ -62,9 +62,7 @@ read_kd_cho_macro <- function(path) {
   kd_cho_long <- melt(
     data = kd_cho, 
     id = 1, 
-    measure = patterns(
-      kif = "^kif", kistretch = "^ki_stretch", kienv = "^kienv", kihiver = "^kihiver", kibouclage = "^ki_bouclage",
-      kivt = "^kivt", kipr = "^kipr", abat_rso = "^abat_rso", kidispo_hqe = "^k_dispo_hqe"
+    measure = patterns(abat_rso = "^abat_rso", kidispo_hqe = "^k_dispo_hqe"
     ), 
     variable.factor = FALSE, 
     variable.name = "palier"
