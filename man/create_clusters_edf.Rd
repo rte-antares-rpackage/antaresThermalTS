@@ -10,7 +10,8 @@ create_clusters_edf(
   start_date = NULL,
   area_name = NULL,
   constraints = NULL,
-  opts = simOptions()
+  opts = simOptions(),
+  correspondance_filiere_cluster = NULL
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ the date will be retrieve from the Antares study.}
 
 \item{opts}{List of simulation parameters returned by the function
 \code{setSimulationPath}}
+
+\item{correspondance_filiere_cluster}{correspondance_filiere_cluster read from correspondance_filiere_cluster.xlsx.}
 }
 \description{
 Create EDF clusters

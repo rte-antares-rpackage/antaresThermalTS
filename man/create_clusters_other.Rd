@@ -11,7 +11,8 @@ create_clusters_other(
   start_date = NULL,
   area_name = NULL,
   constraints = NULL,
-  opts = simOptions()
+  opts = simOptions(),
+  correspondance_filiere_cluster = NULL
 )
 }
 \arguments{
@@ -26,11 +27,13 @@ the date will be retrieve from the Antares study.}
 
 \item{area_name}{Name of the area where to create clusters.}
 
-\item{constraints}{Stretch/Zircaloy constraints read with
-\code{\link{read_constraints}}. Defaults to NULL.}
+\item{constraints}{Stretch/Zircaloy constraints read with}
 
 \item{opts}{List of simulation parameters returned by the function
 \code{setSimulationPath}}
+
+\item{correspondance_filiere_cluster}{correspondance_filiere_cluster read from correspondance_filiere_cluster.xlsx.
+\code{\link{read_constraints}}. Defaults to NULL.}
 }
 \description{
 Create other clusters

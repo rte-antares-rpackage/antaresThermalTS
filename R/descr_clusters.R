@@ -5,7 +5,26 @@
 #' @param name Type of cluster
 #'
 #' @noRd
-descr_clusters <- function(name) {
+descr_clusters <- function(name, clust_desc_from_study = NULL, correspondance_filiere_cluster = NULL) {
+  if(!is.null(correspondance_filiere_cluster)){
+
+    clusterBP <- tolower(correspondance_filiere_cluster[`Type filiere` == name]$`Cluster BP`)
+    sel_clust <- clust_desc_from_study[cluster == clusterBP]
+
+    cluster_infos <- list(group = sel_clust$group,
+                          `min-up-time` = sel_clust$min.up.time,
+                          `min-down-time` = sel_clust$min.down.time,
+                          spinning = sel_clust$spinning,
+                          co2 = sel_clust$co2,
+                          `marginal-cost` = sel_clust$marginal.cost,
+                          `spread-cost` = sel_clust$spread.cost,
+                          `startup-cost` = sel_clust$startup.cost,
+                          `market-bid-cost` = sel_clust$market.bid.cost)
+    cluster_infos <- cluster_infos[sapply(cluster_infos, function(X)!is.na(X))]
+    return(cluster_infos)
+  }
+
+
   descr <- list(
     nuclear_n4 = list(
       `min-up-time` = 168L,
@@ -106,7 +125,7 @@ descr_clusters <- function(name) {
       `market-bid-cost` = 42.91
     )
   )
-  
+
   if (!is.null(name) && name %in% names(descr)) {
     descr[[name]]
   } else {
@@ -172,7 +191,7 @@ corr_groupe_descr <- function(code_groupe) {
                     "BRENNT 3", "BILHOT", "FOSCHT2", "CALAIT1", "DFDC1T 1", "DFDC2T 1",
                     "DFDCOT 1", "DFELDT 1", "DFEGST 1", "DDBZHT 1", "DK6 TAV1", "DK6 TAV2"
   )
-  
+
   if (!is.null(code_groupe) && code_groupe %in% code_groupe_) {
     clus_name_[which(code_groupe_ == code_groupe)]
   } else {
