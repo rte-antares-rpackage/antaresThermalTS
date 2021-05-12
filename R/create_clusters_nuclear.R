@@ -188,7 +188,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
     code_pal <- clusters_desc[corresp_groupes == cluster, c(code_palier)]
     cluster_infos <- descr_clusters(paste0("nuclear_", code_pal), clust_desc_from_study = clust_desc_from_study, correspondance_filiere_cluster = correspondance_filiere_cluster)
 
-    if(!is.null(correspondance_filiere_cluster)){
+    if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
       opts <- editCluster(
         opts = opts,
         area = area_name,

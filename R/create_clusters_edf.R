@@ -154,7 +154,7 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL,
 
     cluster_infos <- descr_clusters(infos_clus$name_desc, clust_desc_from_study = clust_desc_from_study, correspondance_filiere_cluster = correspondance_filiere_cluster)
 
-    if(!is.null(correspondance_filiere_cluster)){
+    if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
       opts <- editCluster(
         opts = opts,
         area = area_name,

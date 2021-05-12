@@ -42,6 +42,7 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
   planning[nom_site == "PONT SUR SAMBRE", code_gp := "SAMBRT1"]
   planning[nom_site == "CROIX DE METZ", code_gp := "C.ME5T01"]
 
+  clust_desc_from_study <- readClusterDesc()
 
   infos[is.na(`for`), `for` := 1]
 
@@ -145,7 +146,7 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
       fo_rate <- rep(0.05, times = n_days)
     }
 
-    if(!is.null(correspondance_filiere_cluster)){
+    if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
       opts <- editCluster(
         opts = opts,
         area = area_name,
