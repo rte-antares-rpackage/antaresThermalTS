@@ -13,6 +13,9 @@
 #' @param opts
 #'   List of simulation parameters returned by the function
 #'   \code{setSimulationPath}
+#' @param opts_bp
+#'   List of simulation parameters returned by the function reference study (generaly bp study)
+#'   \code{setSimulationPath}
 #'
 #' @export
 #'
@@ -27,7 +30,7 @@
 create_clusters_other <- function(planning, infos, hypothesis = NULL,
                                   start_date = NULL, area_name = NULL,
                                   constraints = NULL,
-                                  opts = simOptions(), correspondance_filiere_cluster = NULL) {
+                                  opts = simOptions(), correspondance_filiere_cluster = NULL, opts_bp = NULL) {
 
   if (is.null(start_date))
     start_date <- format(opts$start, format = "%Y-%m-%d")
@@ -42,7 +45,7 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
   planning[nom_site == "PONT SUR SAMBRE", code_gp := "SAMBRT1"]
   planning[nom_site == "CROIX DE METZ", code_gp := "C.ME5T01"]
 
-  clust_desc_from_study <- readClusterDesc()
+  clust_desc_from_study <- readClusterDesc(opts_bp)
 
   infos[is.na(`for`), `for` := 1]
 
@@ -146,42 +149,42 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
       fo_rate <- rep(0.05, times = n_days)
     }
 
-    if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
-      opts <- editCluster(
-        opts = opts,
-        area = area_name,
-        cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
-        add_prefix = TRUE,
-        group = cluster_infos[["group"]],
-        unitcount = 1L,
-        nominalcapacity = floor(infos_clus$pmax),
-        `min-stable-power` = floor(infos_clus$pmin),
-        `must-run` = FALSE,
-        # `min-down-time` = 1L,
-        # `min-up-time` = 168L,
-
-        `min-up-time` = cluster_infos[["min-up-time"]],
-        `min-down-time` = cluster_infos[["min-down-time"]],
-        spinning = cluster_infos[["spinning"]],
-        `marginal-cost` = cluster_infos[["marginal-cost"]],
-        `spread-cost` = cluster_infos[["spread-cost"]],
-        `startup-cost` = cluster_infos[["startup-cost"]],
-        `market-bid-cost` = cluster_infos[["market-bid-cost"]],
-        co2 = cluster_infos[["co2"]],
-
-        prepro_data = matrix(
-          data = c(
-            rep(7, times = n_days),
-            rep(1, times = n_days),
-            fo_rate,
-            rep(0, times = n_days * 2),
-            rep(1, times = n_days * 1)
-          ),
-          ncol = 6
-        ),
-        prepro_modulation = modulation_list[[cluster]]
-      )
-    }else{
+    # if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
+    #   opts <- editCluster(
+    #     opts = opts,
+    #     area = area_name,
+    #     cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
+    #     add_prefix = TRUE,
+    #     group = cluster_infos[["group"]],
+    #     unitcount = 1L,
+    #     nominalcapacity = floor(infos_clus$pmax),
+    #     `min-stable-power` = floor(infos_clus$pmin),
+    #     `must-run` = FALSE,
+    #     # `min-down-time` = 1L,
+    #     # `min-up-time` = 168L,
+    #
+    #     `min-up-time` = cluster_infos[["min-up-time"]],
+    #     `min-down-time` = cluster_infos[["min-down-time"]],
+    #     spinning = cluster_infos[["spinning"]],
+    #     `marginal-cost` = cluster_infos[["marginal-cost"]],
+    #     `spread-cost` = cluster_infos[["spread-cost"]],
+    #     `startup-cost` = cluster_infos[["startup-cost"]],
+    #     `market-bid-cost` = cluster_infos[["market-bid-cost"]],
+    #     co2 = cluster_infos[["co2"]],
+    #
+    #     prepro_data = matrix(
+    #       data = c(
+    #         rep(7, times = n_days),
+    #         rep(1, times = n_days),
+    #         fo_rate,
+    #         rep(0, times = n_days * 2),
+    #         rep(1, times = n_days * 1)
+    #       ),
+    #       ncol = 6
+    #     ),
+    #     prepro_modulation = modulation_list[[cluster]]
+    #   )
+    # }else{
       opts <- createCluster(
         opts = opts,
         area = area_name,
@@ -216,7 +219,7 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
         ),
         prepro_modulation = modulation_list[[cluster]]
       )
-    }
+
   }
 
   invisible(opts)

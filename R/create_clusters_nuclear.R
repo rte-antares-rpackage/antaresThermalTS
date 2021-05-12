@@ -15,6 +15,9 @@
 #' @param opts
 #'   List of simulation parameters returned by the function
 #'   \code{setSimulationPath}
+#' @param opts_bp
+#'   List of simulation parameters returned by the function reference study (generaly bp study)
+#'   \code{setSimulationPath}
 #'
 #' @export
 #'
@@ -26,7 +29,7 @@
 #' @importFrom progress progress_bar
 create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date = NULL, area_name = NULL,
                                     law_planned = "geometric", volatility_planned = 1, constraints = NULL,
-                                    opts = simOptions(), correspondance_filiere_cluster = NULL) {
+                                    opts = simOptions(), correspondance_filiere_cluster = NULL, opts_bp = NULL) {
 
   if (is.null(start_date))
     start_date <- format(opts$start, format = "%Y-%m-%d")
@@ -37,7 +40,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
 
   n_days <- if (is_leapyear(opts)) 366 else 365
 
-  clust_desc_from_study <- readClusterDesc()
+  clust_desc_from_study <- readClusterDesc(opts_bp)
 
   pb <- progress_bar$new(
     format = "  Preparing modulation data [:bar] :percent",
@@ -188,34 +191,34 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
     code_pal <- clusters_desc[corresp_groupes == cluster, c(code_palier)]
     cluster_infos <- descr_clusters(paste0("nuclear_", code_pal), clust_desc_from_study = clust_desc_from_study, correspondance_filiere_cluster = correspondance_filiere_cluster)
 
-    if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
-      opts <- editCluster(
-        opts = opts,
-        area = area_name,
-        cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
-        add_prefix = TRUE,
-        group = "nuclear",
-        unitcount = 1L,
-        nominalcapacity = clusters_desc[corresp_groupes == cluster, c(pcn_mw)],
-        `min-stable-power` = clusters_desc[corresp_groupes == cluster, c(pmin_mw)],
-        `must-run` = FALSE,
-        # `min-down-time` = 1L,
-        # `min-up-time` = 168L,
-        `volatility.planned` = volatility_planned,
-        `law.planned` = law_planned,
-
-        `min-up-time` = cluster_infos[["min-up-time"]],
-        `min-down-time` = cluster_infos[["min-down-time"]],
-        spinning = cluster_infos[["spinning"]],
-        `marginal-cost` = cluster_infos[["marginal-cost"]],
-        `spread-cost` = cluster_infos[["spread-cost"]],
-        `startup-cost` = cluster_infos[["startup-cost"]],
-        `market-bid-cost` = cluster_infos[["market-bid-cost"]],
-
-        prepro_data = data_list[[cluster]],
-        prepro_modulation = modulation_list[[cluster]]
-      )
-    }else{
+    # if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
+    #   opts <- editCluster(
+    #     opts = opts,
+    #     area = area_name,
+    #     cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
+    #     add_prefix = TRUE,
+    #     group = "nuclear",
+    #     unitcount = 1L,
+    #     nominalcapacity = clusters_desc[corresp_groupes == cluster, c(pcn_mw)],
+    #     `min-stable-power` = clusters_desc[corresp_groupes == cluster, c(pmin_mw)],
+    #     `must-run` = FALSE,
+    #     # `min-down-time` = 1L,
+    #     # `min-up-time` = 168L,
+    #     `volatility.planned` = volatility_planned,
+    #     `law.planned` = law_planned,
+    #
+    #     `min-up-time` = cluster_infos[["min-up-time"]],
+    #     `min-down-time` = cluster_infos[["min-down-time"]],
+    #     spinning = cluster_infos[["spinning"]],
+    #     `marginal-cost` = cluster_infos[["marginal-cost"]],
+    #     `spread-cost` = cluster_infos[["spread-cost"]],
+    #     `startup-cost` = cluster_infos[["startup-cost"]],
+    #     `market-bid-cost` = cluster_infos[["market-bid-cost"]],
+    #
+    #     prepro_data = data_list[[cluster]],
+    #     prepro_modulation = modulation_list[[cluster]]
+    #   )
+    # }else{
     opts <- createCluster(
       opts = opts,
       area = area_name,
@@ -242,7 +245,7 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
       prepro_data = data_list[[cluster]],
       prepro_modulation = modulation_list[[cluster]]
     )
-    }
+    # }
   }
 
   invisible(opts)

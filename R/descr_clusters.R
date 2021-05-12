@@ -10,6 +10,7 @@ descr_clusters <- function(name, clust_desc_from_study = NULL, correspondance_fi
 
     clusterBP <- tolower(correspondance_filiere_cluster[`Type filiere` == name]$`Cluster BP`)
     sel_clust <- clust_desc_from_study[cluster == clusterBP]
+    if(nrow(sel_clust)>0){
 
     cluster_infos <- list(group = sel_clust$group,
                           `min-up-time` = sel_clust$min.up.time,
@@ -22,9 +23,11 @@ descr_clusters <- function(name, clust_desc_from_study = NULL, correspondance_fi
                           `market-bid-cost` = sel_clust$market.bid.cost)
     cluster_infos <- cluster_infos[sapply(cluster_infos, function(X)!is.na(X))]
     return(cluster_infos)
+
+    }
   }
 
-
+  warning(paste0("Used of default data for ", name))
   descr <- list(
     nuclear_n4 = list(
       `min-up-time` = 168L,
