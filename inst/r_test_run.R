@@ -89,6 +89,11 @@ info_de <- read_info(path = file.path(path_input, name_plan_de))
 plan_total <- read_planning(path = file.path(path_input, name_plan_total))
 info_total <- read_info(path = file.path(path_input, name_plan_total))
 
+info_total <- read_info(path = file.path(path_input, "Macro_import_NUC_mars2020.xlsm"))
+
+info_total <- read_kd_cho_macro(file.path(path_input, "Macro_import_NUC_mars2020.xlsm"), sheet = "Caractéristique")
+
+
 #Recopilation d'infos de groupes THF (hors EDF)
 plans <- rbindlist(list(plan_gdf, plan_uniper, plan_pss, plan_de, plan_total))
 infos <- rbindlist(list(info_gdf, info_uniper, info_pss, info_de, info_total))

@@ -5,13 +5,13 @@
 #'
 #' @return a \code{data.table}
 #' @export
-#' 
+#'
 #' @name read-kd-cho
-#' 
+#'
 #' @importFrom utils packageVersion
 #' @importFrom readxl read_excel
 #' @importFrom janitor clean_names
-#' @importFrom data.table setDT setnames melt := 
+#' @importFrom data.table setDT setnames melt :=
 #' @importFrom stringi stri_replace_all_charclass
 #'
 read_kd_cho <- function(path) {
@@ -27,10 +27,10 @@ read_kd_cho <- function(path) {
     }
   }), .SDcols = names(kd_cho)]
   kd_cho_long <- melt(
-    data = kd_cho, 
-    id = 1:4, 
-    measure = patterns(kif = "^kif", kistretch = "^ki_stretch", kienv = "^kienv", kihiver = "^kihiver", kibouclage = "^ki_bouclage"), 
-    variable.factor = FALSE, 
+    data = kd_cho,
+    id = 1:4,
+    measure = patterns(kif = "^kif", kistretch = "^ki_stretch", kienv = "^kienv", kihiver = "^kihiver", kibouclage = "^ki_bouclage"),
+    variable.factor = FALSE,
     variable.name = "palier"
   )
   kd_cho_long[palier == "1", `:=`(palier = "Palier 900 MW", code_palier = "cp0_cp_cp2")]
@@ -44,10 +44,10 @@ read_kd_cho <- function(path) {
 
 #' @rdname read-kd-cho
 #' @export
-read_kd_cho_macro <- function(path) {
-  
-  kd_cho <- read_excel(path = path, sheet = "Kd CHO", skip = 4, n_max = 105)
-  
+read_kd_cho_macro <- function(path, sheet = "Kd CHO") {
+
+  kd_cho <- read_excel(path = path, sheet = sheet, skip = 4, n_max = 105)
+
   kd_cho <- janitor::clean_names(kd_cho)
   setDT(kd_cho)
   kd_cho[, (names(kd_cho)) := lapply(.SD, function(x) {
@@ -58,23 +58,23 @@ read_kd_cho_macro <- function(path) {
     }
   }), .SDcols = names(kd_cho)]
 
-  
+
   kd_cho_long <- melt(
-    data = kd_cho, 
-    id = 1, 
+    data = kd_cho,
+    id = 1,
     measure = patterns(abat_rso = "^abat_rso", kidispo_hqe = "^k_dispo_hqe"
-    ), 
-    variable.factor = FALSE, 
+    ),
+    variable.factor = FALSE,
     variable.name = "palier"
   )
-  
+
   kd_cho_long[palier == "1", `:=`(palier = "Palier 900 MW", code_palier = "cp0_cp_cp2")]
   kd_cho_long[palier == "2", `:=`(palier = "Palier 1300 MW", code_palier = "p4")]
   kd_cho_long[palier == "3", `:=`(palier = "Palier N4", code_palier = "n4")]
 
   kd_cho_long[is.na(abat_rso), abat_rso := 1]
   kd_cho_long[abat_rso > 1 | abat_rso < 0, abat_rso := 1]
-  
+
   kd_cho_long[]
 }
 
