@@ -8,7 +8,7 @@
 \usage{
 read_kd_cho(path)
 
-read_kd_cho_macro(path)
+read_kd_cho_macro(path, sheet = "Kd CHO")
 }
 \arguments{
 \item{path}{Path to Excel file.}

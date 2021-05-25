@@ -78,6 +78,10 @@ read_info <- function(path) {
   setnames(clus_infos2, "...1", "edp_ed_prev")
   setnames(clus_infos2, "pcn", "pmax")
   setnames(clus_infos2, "...8", "code_gp")
+  setnames(clus_infos2, "reserve_secondaire", "sec")
+  setnames(clus_infos2, "part_francaise", "for")
+  setnames(clus_infos2, "cut", "type_groupe")
+
   clus_infos <- clus_infos2
 
   clus_infos <- unique(clus_infos, by = "edp_ed_prev")

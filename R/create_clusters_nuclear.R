@@ -122,7 +122,10 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
       if (nrow(dat) == 0) {
 
         coef_clus <- get_clusters_coef(cluster, clusters_desc, kd_cho, start_date)
-
+        if(nrow(coef_clus)==0){
+          warning("cluster not found, not write")
+          return(NULL)
+        }
         res <- matrix(
           data = c(
             rep(7, times = n_days * 1),
@@ -183,13 +186,15 @@ create_clusters_nuclear <- function(calendar, clusters_desc, kd_cho, start_date 
     format = "  Creating nuclear clusters [:bar] :percent",
     total = length(unique_tranches), clear = FALSE
   )
-
+  unique_tranches <- unique_tranches[!is.na(unique_tranches)]
   for (cluster in unique_tranches) {
 
     pb$tick()
 
     code_pal <- clusters_desc[corresp_groupes == cluster, c(code_palier)]
-    cluster_infos <- descr_clusters(paste0("nuclear_", code_pal), clust_desc_from_study = clust_desc_from_study, correspondance_filiere_cluster = correspondance_filiere_cluster)
+    cluster_infos <- descr_clusters(paste0("nuclear_", code_pal),
+                                    clust_desc_from_study = clust_desc_from_study,
+                                    correspondance_filiere_cluster = correspondance_filiere_cluster)
 
     # if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
     #   opts <- editCluster(

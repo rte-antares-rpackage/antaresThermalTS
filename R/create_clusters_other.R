@@ -139,87 +139,95 @@ create_clusters_other <- function(planning, infos, hypothesis = NULL,
 
     infos_clus <- infos[code_gp == cluster]
 
-    cluster_infos <- descr_clusters(infos_clus[["name_desc"]], clust_desc_from_study = clust_desc_from_study, correspondance_filiere_cluster = correspondance_filiere_cluster)
+    if(any(is.na(infos_clus[["name_desc"]]))){
+      warning(paste0("No data for", cluster))
+    }else{
 
-    if (!is.null(hypothesis) && isTRUE(infos_clus[["name_desc"]] %in% hypothesis$name_desc)) {
-      fo_rate <- get_fo_rate_edf(edf = kp, code_groupe = infos_clus[["name_desc"]], date_study = start_date)
-      fo_rate <- 1 - head(fo_rate$kp_value, n_days)
-    } else {
-      # fo_rate <- rep(1 - infos_clus[["for"]], times = 365)
-      fo_rate <- rep(0.05, times = n_days)
-    }
 
-    # if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
-    #   opts <- editCluster(
-    #     opts = opts,
-    #     area = area_name,
-    #     cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
-    #     add_prefix = TRUE,
-    #     group = cluster_infos[["group"]],
-    #     unitcount = 1L,
-    #     nominalcapacity = floor(infos_clus$pmax),
-    #     `min-stable-power` = floor(infos_clus$pmin),
-    #     `must-run` = FALSE,
-    #     # `min-down-time` = 1L,
-    #     # `min-up-time` = 168L,
-    #
-    #     `min-up-time` = cluster_infos[["min-up-time"]],
-    #     `min-down-time` = cluster_infos[["min-down-time"]],
-    #     spinning = cluster_infos[["spinning"]],
-    #     `marginal-cost` = cluster_infos[["marginal-cost"]],
-    #     `spread-cost` = cluster_infos[["spread-cost"]],
-    #     `startup-cost` = cluster_infos[["startup-cost"]],
-    #     `market-bid-cost` = cluster_infos[["market-bid-cost"]],
-    #     co2 = cluster_infos[["co2"]],
-    #
-    #     prepro_data = matrix(
-    #       data = c(
-    #         rep(7, times = n_days),
-    #         rep(1, times = n_days),
-    #         fo_rate,
-    #         rep(0, times = n_days * 2),
-    #         rep(1, times = n_days * 1)
-    #       ),
-    #       ncol = 6
-    #     ),
-    #     prepro_modulation = modulation_list[[cluster]]
-    #   )
-    # }else{
-      opts <- createCluster(
-        opts = opts,
-        area = area_name,
-        cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
-        add_prefix = TRUE,
-        group = cluster_infos[["group"]],
-        unitcount = 1L,
-        nominalcapacity = floor(infos_clus$pmax),
-        `min-stable-power` = floor(infos_clus$pmin),
-        `must-run` = FALSE,
-        # `min-down-time` = 1L,
-        # `min-up-time` = 168L,
+      cluster_infos <- descr_clusters(infos_clus[["name_desc"]], clust_desc_from_study = clust_desc_from_study, correspondance_filiere_cluster = correspondance_filiere_cluster)
 
-        `min-up-time` = cluster_infos[["min-up-time"]],
-        `min-down-time` = cluster_infos[["min-down-time"]],
-        spinning = cluster_infos[["spinning"]],
-        `marginal-cost` = cluster_infos[["marginal-cost"]],
-        `spread-cost` = cluster_infos[["spread-cost"]],
-        `startup-cost` = cluster_infos[["startup-cost"]],
-        `market-bid-cost` = cluster_infos[["market-bid-cost"]],
-        co2 = cluster_infos[["co2"]],
+      if (!is.null(hypothesis) && isTRUE(infos_clus[["name_desc"]] %in% hypothesis$name_desc)) {
+        fo_rate <- get_fo_rate_edf(edf = kp, code_groupe = infos_clus[["name_desc"]], date_study = start_date)
+        fo_rate <- 1 - head(fo_rate$kp_value, n_days)
+      } else {
+        # fo_rate <- rep(1 - infos_clus[["for"]], times = 365)
+        fo_rate <- rep(0.05, times = n_days)
+      }
+      clust_desc_from_study2 <- readClusterDesc(opts)
 
-        prepro_data = matrix(
-          data = c(
-            rep(7, times = n_days),
-            rep(1, times = n_days),
-            fo_rate,
-            rep(0, times = n_days * 2),
-            rep(1, times = n_days * 1)
+      if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study2$cluster){
+        opts <- editCluster(
+          opts = opts,
+          area = area_name,
+          cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
+          add_prefix = TRUE,
+          group = cluster_infos[["group"]],
+          unitcount = 1L,
+          nominalcapacity = floor(infos_clus$pmax),
+          `min-stable-power` = floor(infos_clus$pmin),
+          `must-run` = FALSE,
+          # `min-down-time` = 1L,
+          # `min-up-time` = 168L,
+
+          `min-up-time` = cluster_infos[["min-up-time"]],
+          `min-down-time` = cluster_infos[["min-down-time"]],
+          spinning = cluster_infos[["spinning"]],
+          `marginal-cost` = cluster_infos[["marginal-cost"]],
+          `spread-cost` = cluster_infos[["spread-cost"]],
+          `startup-cost` = cluster_infos[["startup-cost"]],
+          `market-bid-cost` = cluster_infos[["market-bid-cost"]],
+          co2 = cluster_infos[["co2"]],
+
+          prepro_data = matrix(
+            data = c(
+              rep(7, times = n_days),
+              rep(1, times = n_days),
+              fo_rate,
+              rep(0, times = n_days * 2),
+              rep(1, times = n_days * 1)
+            ),
+            ncol = 6
           ),
-          ncol = 6
-        ),
-        prepro_modulation = modulation_list[[cluster]]
-      )
+          prepro_modulation = modulation_list[[cluster]]
+        )
+      }else{
+        opts <- createCluster(
+          opts = opts,
+          area = area_name,
+          cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
+          add_prefix = TRUE,
+          group = cluster_infos[["group"]],
+          unitcount = 1L,
+          nominalcapacity = unique(floor(infos_clus$pmax)),
+          `min-stable-power` =  unique(floor(infos_clus$pmin)),
+          `must-run` = FALSE,
+          # `min-down-time` = 1L,
+          # `min-up-time` = 168L,
 
+          `min-up-time` = cluster_infos[["min-up-time"]],
+          `min-down-time` = cluster_infos[["min-down-time"]],
+          spinning = cluster_infos[["spinning"]],
+          `marginal-cost` = unique(cluster_infos[["marginal-cost"]]),
+          `spread-cost` = cluster_infos[["spread-cost"]],
+          `startup-cost` = cluster_infos[["startup-cost"]],
+          `market-bid-cost` = cluster_infos[["market-bid-cost"]],
+          co2 = cluster_infos[["co2"]],
+
+          prepro_data = matrix(
+            data = c(
+              rep(7, times = n_days),
+              rep(1, times = n_days),
+              fo_rate,
+              rep(0, times = n_days * 2),
+              rep(1, times = n_days * 1)
+            ),
+            ncol = 6
+          ),
+          prepro_modulation = modulation_list[[cluster]]
+        )
+
+      }
+    }
   }
 
   invisible(opts)

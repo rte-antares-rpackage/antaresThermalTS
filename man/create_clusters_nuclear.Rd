@@ -14,7 +14,8 @@ create_clusters_nuclear(
   volatility_planned = 1,
   constraints = NULL,
   opts = simOptions(),
-  correspondance_filiere_cluster = NULL
+  correspondance_filiere_cluster = NULL,
+  opts_bp = NULL
 )
 }
 \arguments{
@@ -40,6 +41,9 @@ the date will be retrieve from the Antares study.}
 \code{setSimulationPath}}
 
 \item{correspondance_filiere_cluster}{correspondance_filiere_cluster read from correspondance_filiere_cluster.xlsx.}
+
+\item{opts_bp}{List of simulation parameters returned by the function reference study (generaly bp study)
+\code{setSimulationPath}}
 }
 \description{
 Create nuclear clusters

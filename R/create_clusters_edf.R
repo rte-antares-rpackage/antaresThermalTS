@@ -157,33 +157,35 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL,
 
     cluster_infos <- descr_clusters(infos_clus$name_desc, clust_desc_from_study = clust_desc_from_study, correspondance_filiere_cluster = correspondance_filiere_cluster)
 
-    # if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study$cluster){
-    #   opts <- editCluster(
-    #     opts = opts,
-    #     area = area_name,
-    #     cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
-    #     add_prefix = TRUE,
-    #     group = cluster_infos[["group"]],
-    #     unitcount = 1L,
-    #     nominalcapacity = floor(infos_clus$pcn_mw),
-    #     `min-stable-power` = floor(infos_clus$pmin_mw),
-    #     `must-run` = FALSE,
-    #     # `min-down-time` = 1L,
-    #     # `min-up-time` = 168L,
-    #
-    #     `min-up-time` = cluster_infos[["min-up-time"]],
-    #     `min-down-time` = cluster_infos[["min-down-time"]],
-    #     spinning = cluster_infos[["spinning"]],
-    #     `marginal-cost` = cluster_infos[["marginal-cost"]],
-    #     `spread-cost` = cluster_infos[["spread-cost"]],
-    #     `startup-cost` = cluster_infos[["startup-cost"]],
-    #     `market-bid-cost` = cluster_infos[["market-bid-cost"]],
-    #     co2 = cluster_infos[["co2"]],
-    #
-    #     prepro_data = data_list[[cluster]],
-    #     prepro_modulation = modulation_list[[cluster]]
-    #   )
-    # }else{
+
+    clust_desc_from_study2 <- readClusterDesc(opts)
+    if(tolower(paste0(area_name, "_",stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_")))%in%clust_desc_from_study2$cluster){
+      opts <- editCluster(
+        opts = opts,
+        area = area_name,
+        cluster_name = stri_replace_all_regex(str = cluster, pattern = "[^[:alnum:]]", replacement = "_"),
+        add_prefix = TRUE,
+        group = cluster_infos[["group"]],
+        unitcount = 1L,
+        nominalcapacity = floor(infos_clus$pcn_mw),
+        `min-stable-power` = floor(infos_clus$pmin_mw),
+        `must-run` = FALSE,
+        # `min-down-time` = 1L,
+        # `min-up-time` = 168L,
+
+        `min-up-time` = cluster_infos[["min-up-time"]],
+        `min-down-time` = cluster_infos[["min-down-time"]],
+        spinning = cluster_infos[["spinning"]],
+        `marginal-cost` = cluster_infos[["marginal-cost"]],
+        `spread-cost` = cluster_infos[["spread-cost"]],
+        `startup-cost` = cluster_infos[["startup-cost"]],
+        `market-bid-cost` = cluster_infos[["market-bid-cost"]],
+        co2 = cluster_infos[["co2"]],
+
+        prepro_data = data_list[[cluster]],
+        prepro_modulation = modulation_list[[cluster]]
+      )
+    }else{
       opts <- createCluster(
         opts = opts,
         area = area_name,
@@ -209,7 +211,7 @@ create_clusters_edf <- function(planning, hypothesis, start_date = NULL,
         prepro_data = data_list[[cluster]],
         prepro_modulation = modulation_list[[cluster]]
       )
-    # }
+    }
   }
 
   invisible(opts)

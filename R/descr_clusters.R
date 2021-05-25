@@ -7,8 +7,8 @@
 #' @noRd
 descr_clusters <- function(name, clust_desc_from_study = NULL, correspondance_filiere_cluster = NULL) {
   if(!is.null(correspondance_filiere_cluster)){
-
-    clusterBP <- tolower(correspondance_filiere_cluster[`Type filiere` == name]$`Cluster BP`)
+    correspondance_filiere_cluster <- data.table(correspondance_filiere_cluster)
+    clusterBP <- tolower(correspondance_filiere_cluster[`Type filiere` %in% name]$`Cluster BP`)
     sel_clust <- clust_desc_from_study[cluster == clusterBP]
     if(nrow(sel_clust)>0){
 

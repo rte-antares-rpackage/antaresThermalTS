@@ -4,10 +4,12 @@
 \alias{read_kp_edf}
 \title{Read Kp coefficents for EDF clusters}
 \usage{
-read_kp_edf(path)
+read_kp_edf(path, path_pmin_pmax = NULL)
 }
 \arguments{
 \item{path}{Path to Excel file.}
+
+\item{path_pmin_pmax}{File for pman and pmax produce by cnes macro}
 }
 \value{
 a \code{data.table}

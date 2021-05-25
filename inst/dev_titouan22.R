@@ -14,6 +14,13 @@ for(i in 1:nrow(clus_infos2)){
 }
 clus_infos2 <- clus_infos2[!is.na(pcn)]
 
+
+setnames(clus_infos2, "...1", "edp_ed_prev")
+setnames(clus_infos2, "pcn", "pmax")
+setnames(clus_infos2, "...8", "code_gp")
+clus_infos <- clus_infos2
+
+
 name_hypotheses <- "HypothesesRTE_Mars.xlsx"
 info_gdf <- read_info(path = file.path(path_input, name_plan_gdf))
 
@@ -24,12 +31,8 @@ setDT(clus_infos)
 clus_infos <- clus_infos[!is.na(edp_ed_prev)]
 
 
-setnames(clus_infos2, "...1", "edp_ed_prev")
-setnames(clus_infos2, "pcn", "pmax")
-setnames(clus_infos2, "...8", "code_gp")
 
 
-clus_infos <- clus_infos2
 
 
 # corresp <- rbindlist(list(
